@@ -25,6 +25,7 @@ create table manifestations (
     form_type form_type not null,
     genre text,
     subgenre text,
+    has_transcription boolean, -- 'YES, NO, ? = NULL'
     fingerprint text
 );
 
