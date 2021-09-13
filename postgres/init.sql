@@ -1,6 +1,8 @@
 drop table if exists manifestations cascade;
 create table manifestations (
     id uuid primary key,
+    earliest date not null,
+    latest date not null,
     fingerprint text
 );
 
