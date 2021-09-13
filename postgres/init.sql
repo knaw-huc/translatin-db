@@ -23,6 +23,8 @@ create table manifestations (
     latest date not null,
     form form,
     form_type form_type not null,
+    genre text,
+    subgenre text,
     fingerprint text
 );
 
