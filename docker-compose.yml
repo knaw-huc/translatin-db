@@ -1,0 +1,19 @@
+version: '3.5'
+
+services:
+  postgres:
+    container_name: translatin_postgres
+    image: postgres:11-alpine
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_PASSWORD: translatin
+      POSTGRES_DB: translatin
+      POSTGRES_USER: translatin
+      PGDATA: /var/lib/translatin/data
+    volumes:
+      - postgresdata:/var/lib/translatin/data
+
+volumes:
+  postgresdata:
+    driver: local
