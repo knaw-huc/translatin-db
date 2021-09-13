@@ -26,7 +26,10 @@ create table manifestations (
     genre text,
     subgenre text,
     has_transcription boolean, -- 'YES, NO, ? = NULL'
-    fingerprint text
+    fingerprint text,
+    characters text,
+    literature text,
+    remarks text
 );
 
 drop type if exists languages cascade;
