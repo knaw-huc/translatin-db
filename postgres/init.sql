@@ -1,8 +1,28 @@
+drop type if exists form;
+create type form as enum (
+    'First Printing',
+    'Fragment',
+    'Manuscript',
+    'Mention',
+    'Reprint',
+    'Synopsis (manuscript)'
+    'Synopsis (printed)'
+);
+
+drop type if exists form_type;
+create type form_type as enum (
+    'Fragment',
+    'Full edition',
+    'Synopsis'
+);
+
 drop table if exists manifestations cascade;
 create table manifestations (
     id uuid primary key,
     earliest date not null,
     latest date not null,
+    form form,
+    form_type form_type not null,
     fingerprint text
 );
 
