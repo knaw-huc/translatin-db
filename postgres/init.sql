@@ -75,3 +75,18 @@ create table authors_manifestations (
     foreign key (author_id) references authors (id)
 );
 create unique index on authors_manifestations (manifestation_id, author_id);
+
+drop table if exists publishers cascade;
+create table publishers (
+    id uuid primary key
+);
+
+drop table if exists manifestations_publishers cascade;
+create table manifestations_publishers (
+    manifestation_id uuid not null,
+    publisher_id uuid not null,
+    primary key (manifestation_id, publisher_id),
+    foreign key (manifestation_id) references manifestations (id),
+    foreign key (publisher_id) references publishers (id)
+);
+create unique index on manifestations_publishers (publisher_id, manifestation_id);
