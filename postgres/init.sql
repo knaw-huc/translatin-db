@@ -6,7 +6,6 @@ create type form as enum (
     'Mention',
     'Reprint',
     'Synopsis',
-    'Synopsis (gedrukt)',
     'Synopsis (manuscript)',
     'Synopsis (printed)'
 );

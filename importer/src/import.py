@@ -41,7 +41,7 @@ def create_manifestations(cursor):
 
         # optional fields
         if row[MF_FORM]:
-            man['form'] = row[MF_FORM]
+            man['form'] = fix_form(row[MF_FORM])
         if row[MF_FINGERPRINT]:
             man['fingerprint'] = row[MF_FINGERPRINT]
         if row[MF_GENRE]:
@@ -68,6 +68,12 @@ def create_manifestations(cursor):
         man['_languages'] = remove_duplicates(languages)
 
         create_manifestation(cursor, man)
+
+
+def fix_form(form):
+    if form == 'Synopsis (gedrukt)':
+        return 'Synopsis (printed)'
+    return form
 
 
 def fix_language(lang):
