@@ -10,7 +10,8 @@ from psycopg2.extras import execute_values
 import uuid
 
 from mapping import MF_ORIGIN, MF_CENETON_FROM, MF_CENETON_UPTO, MF_EARLIEST, MF_LATEST, MF_FINGERPRINT, \
-    MF_FORM, MF_FORM_TYPE, MF_GENRE, MF_SUBGENRE, MF_CHARACTERS, MF_REMARKS, MF_LITERATURE, MF_HAS_TRANSCRIPTION
+    MF_TITLE_FROM, MF_TITLE_UPTO, MF_FORM, MF_FORM_TYPE, MF_GENRE, MF_SUBGENRE, MF_CHARACTERS, MF_REMARKS, \
+    MF_LITERATURE, MF_HAS_TRANSCRIPTION
 
 wb = load_workbook("/Users/jong/prj/translatin/download/TransLatin_Manifestations.xlsx")
 ic(wb.sheetnames)
@@ -54,13 +55,22 @@ def create_manifestations(cursor):
         if row[MF_LITERATURE]:
             man['literature'] = row[MF_LITERATURE]
 
-        ceneton_ids = [row[cid] for cid in range(MF_CENETON_FROM, MF_CENETON_UPTO) if row[cid]]
-        man['_ceneton'] = list(dict.fromkeys(ceneton_ids))  # remove duplicates, maintaining original insertion order
+        # 1:n relationship with Ceneton identifiers
+        ceneton_ids = [row[i] for i in range(MF_CENETON_FROM, MF_CENETON_UPTO) if row[i]]
+        man['_ceneton'] = remove_duplicates(ceneton_ids)
 
-        save_manifestation(cursor, man)
+        # 1:n relationship with titles
+        titles = [row[i] for i in range(MF_TITLE_FROM, MF_TITLE_UPTO) if row[i]]
+        man['_titles'] = remove_duplicates(titles)
+
+        create_manifestation(cursor, man)
 
 
-def save_manifestation(cursor, man):
+def remove_duplicates(some_list):
+    return list(dict.fromkeys(some_list))  # as of Python 3.7 also maintains original insertion order
+
+
+def create_manifestation(cursor, man):
     if 'id' not in man:
         man['id'] = uuid.uuid4()
 
@@ -75,6 +85,10 @@ def save_manifestation(cursor, man):
 
     stmt = 'INSERT INTO manifestation_ceneton (manifestation_id, ceneton_id) VALUES %s'
     data = [(man['id'], cid) for cid in man['_ceneton']]
+    execute_values(cursor, stmt, data)
+
+    stmt = 'INSERT INTO manifestation_titles (manifestation_id, title) VALUES %s'
+    data = [(man['id'], title) for title in man['_titles']]
     execute_values(cursor, stmt, data)
 
 
