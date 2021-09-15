@@ -10,8 +10,8 @@ from psycopg2.extras import execute_values
 import uuid
 
 from mapping import MF_ORIGIN, MF_CENETON_FROM, MF_CENETON_UPTO, MF_EARLIEST, MF_LATEST, MF_FINGERPRINT, \
-    MF_TITLE_FROM, MF_TITLE_UPTO, MF_FORM, MF_FORM_TYPE, MF_GENRE, MF_SUBGENRE, MF_CHARACTERS, MF_REMARKS, \
-    MF_LITERATURE, MF_HAS_TRANSCRIPTION
+    MF_LANG_FROM, MF_LANG_UPTO, MF_TITLE_FROM, MF_TITLE_UPTO, MF_FORM, MF_FORM_TYPE, MF_GENRE, MF_SUBGENRE, \
+    MF_CHARACTERS, MF_REMARKS, MF_LITERATURE, MF_HAS_TRANSCRIPTION
 
 wb = load_workbook("/Users/jong/prj/translatin/download/TransLatin_Manifestations.xlsx")
 ic(wb.sheetnames)
@@ -63,7 +63,17 @@ def create_manifestations(cursor):
         titles = [row[i] for i in range(MF_TITLE_FROM, MF_TITLE_UPTO) if row[i]]
         man['_titles'] = remove_duplicates(titles)
 
+        # 1:n relationship with (language, certainty) aka 'Language' pairs
+        languages = [(fix_language(row[i]), row[i + 1]) for i in range(MF_LANG_FROM, MF_LANG_UPTO, 2) if row[i]]
+        man['_languages'] = remove_duplicates(languages)
+
         create_manifestation(cursor, man)
+
+
+def fix_language(lang):
+    if lang == 'Nederlands':
+        return 'Dutch'
+    return lang
 
 
 def remove_duplicates(some_list):
@@ -90,6 +100,11 @@ def create_manifestation(cursor, man):
     stmt = 'INSERT INTO manifestation_titles (manifestation_id, title) VALUES %s'
     data = [(man['id'], title) for title in man['_titles']]
     execute_values(cursor, stmt, data)
+
+    stmt = 'INSERT INTO manifestation_languages (manifestation_id, language, certainty) VALUES %s'
+    data = [(man['id'], lang, cert) for lang, cert in man['_languages']]
+    execute_values(cursor, stmt, data)
+    conn.commit()
 
 
 def show_titles():

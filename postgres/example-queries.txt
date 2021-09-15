@@ -12,3 +12,10 @@ translatin=# select sub.title_count,count(*) from (select distinct(manifestation
            2 |    71
            1 |  2178
 (2 rows)
+
+translatin=# select sub.lang_count as "# languages",count(*) from (select distinct(manifestation_id),count(*) as lang_count from manifestation_titles group by manifestation_id) sub group by sub.lang_count order by count desc;
+ # languages | count
+-------------+-------
+           1 |  2178
+           2 |    71
+(2 rows)
