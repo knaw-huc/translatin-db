@@ -57,21 +57,24 @@ def create_manifestations(cursor):
 
         # 1:n relationship with Ceneton identifiers
         ceneton_ids = [row[i] for i in range(MF_CENETON_FROM, MF_CENETON_UPTO) if row[i]]
-        man['_ceneton'] = fix_duplicates(ceneton_ids)
+        man['_ceneton'] = fix_duplicates(row[MF_ORIGIN], ceneton_ids)
 
         # 1:n relationship with titles
         titles = [row[i] for i in range(MF_TITLE_FROM, MF_TITLE_UPTO) if row[i]]
-        man['_titles'] = fix_duplicates(titles)
+        man['_titles'] = fix_duplicates(row[MF_ORIGIN], titles)
 
         # 1:n relationship with (language, certainty) aka 'Language' pairs
         languages = [(fix_language(row[i]), row[i + 1]) for i in range(MF_LANG_FROM, MF_LANG_UPTO, 2) if row[i]]
-        man['_languages'] = fix_duplicates(languages)
+        man['_languages'] = fix_duplicates(row[MF_ORIGIN], languages)
 
         create_manifestation(cursor, man)
 
 
-def fix_duplicates(some_list):
-    return list(dict.fromkeys(some_list))  # as of Python 3.7 also maintains original insertion order
+def fix_duplicates(origin, some_list):
+    normalised = list(dict.fromkeys(some_list))  # as of Python 3.7 also maintains original insertion order
+    if normalised != some_list:
+        ic('FIXING DUPLICATE: ', origin, some_list)
+    return normalised
 
 
 def fix_form(form):
