@@ -85,12 +85,9 @@ def create_manifestation(cursor, man):
         man['id'] = uuid.uuid4()
 
     stmt = 'INSERT INTO manifestations (%s) VALUES %s'
-
-    columns = [column for column in man.keys() if not column.startswith('_')]
-    values = [man[column] for column in columns]
+    columns = [col for col in man.keys() if not col.startswith('_')]
+    values = [man[col] for col in columns]
     data = (AsIs(','.join(columns)), tuple(values))
-
-    # ic(cursor.mogrify(stmt, data))
     cursor.execute(stmt, data)
 
     stmt = 'INSERT INTO manifestation_ceneton (manifestation_id, ceneton_id) VALUES %s'
