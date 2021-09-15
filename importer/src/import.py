@@ -57,15 +57,15 @@ def create_manifestations(cursor):
 
         # 1:n relationship with Ceneton identifiers
         ceneton_ids = [row[i] for i in range(MF_CENETON_FROM, MF_CENETON_UPTO) if row[i]]
-        man['_ceneton'] = remove_duplicates(ceneton_ids)
+        man['_ceneton'] = fix_duplicates(ceneton_ids)
 
         # 1:n relationship with titles
         titles = [row[i] for i in range(MF_TITLE_FROM, MF_TITLE_UPTO) if row[i]]
-        man['_titles'] = remove_duplicates(titles)
+        man['_titles'] = fix_duplicates(titles)
 
         # 1:n relationship with (language, certainty) aka 'Language' pairs
         languages = [(fix_language(row[i]), row[i + 1]) for i in range(MF_LANG_FROM, MF_LANG_UPTO, 2) if row[i]]
-        man['_languages'] = remove_duplicates(languages)
+        man['_languages'] = fix_duplicates(languages)
 
         create_manifestation(cursor, man)
 
@@ -82,7 +82,7 @@ def fix_language(lang):
     return lang
 
 
-def remove_duplicates(some_list):
+def fix_duplicates(some_list):
     return list(dict.fromkeys(some_list))  # as of Python 3.7 also maintains original insertion order
 
 
