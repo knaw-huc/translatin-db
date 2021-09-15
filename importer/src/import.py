@@ -23,11 +23,12 @@ def create_manifestations(cursor):
     # iterate over all rows after title row
     for row in sheet.iter_rows(min_row=2, values_only=True):
         # mandatory fields, usable 'as is'
-        man = {'origin': ic(row[MF_ORIGIN]),
-               'earliest': row[MF_EARLIEST],
-               'latest': row[MF_LATEST],
-               'fingerprint': row[MF_FINGERPRINT],
-               'form_type': row[MF_FORM_TYPE]}
+        man = {
+            'origin': ic(row[MF_ORIGIN]),
+            'earliest': row[MF_EARLIEST],
+            'latest': row[MF_LATEST],
+            'form_type': row[MF_FORM_TYPE]
+        }
 
         # mandatory field requiring a massage: 'has_transcription'. Defaults to False for empty cells,
         # has 'YES' for True and '?' for to-be-determined which is NULL in db
@@ -39,6 +40,8 @@ def create_manifestations(cursor):
         # optional fields
         if row[MF_FORM]:
             man['form'] = row[MF_FORM]
+        if row[MF_FINGERPRINT]:
+            man['fingerprint'] = row[MF_FINGERPRINT]
         if row[MF_GENRE]:
             man['genre'] = row[MF_GENRE]
         if row[MF_SUBGENRE]:
