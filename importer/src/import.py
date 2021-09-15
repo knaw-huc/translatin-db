@@ -70,6 +70,10 @@ def create_manifestations(cursor):
         create_manifestation(cursor, man)
 
 
+def fix_duplicates(some_list):
+    return list(dict.fromkeys(some_list))  # as of Python 3.7 also maintains original insertion order
+
+
 def fix_form(form):
     if form == 'Synopsis (gedrukt)':
         return 'Synopsis (printed)'
@@ -80,10 +84,6 @@ def fix_language(lang):
     if lang == 'Nederlands':
         return 'Dutch'
     return lang
-
-
-def fix_duplicates(some_list):
-    return list(dict.fromkeys(some_list))  # as of Python 3.7 also maintains original insertion order
 
 
 def create_manifestation(cursor, man):
