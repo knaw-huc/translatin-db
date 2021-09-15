@@ -104,7 +104,6 @@ def create_manifestation(cursor, man):
     stmt = 'INSERT INTO manifestation_languages (manifestation_id, language, certainty) VALUES %s'
     data = [(man['id'], lang, cert) for lang, cert in man['_languages']]
     execute_values(cursor, stmt, data)
-    conn.commit()
 
 
 def show_titles():
