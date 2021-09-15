@@ -1,0 +1,3 @@
+icecream
+openpyxl
+psycopg2-binary
