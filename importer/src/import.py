@@ -9,7 +9,7 @@ from psycopg2.extensions import AsIs
 import uuid
 
 from mapping import MF_ORIGIN, MF_EARLIEST, MF_LATEST, MF_FINGERPRINT, MF_FORM, MF_FORM_TYPE, \
-    MF_GENRE, MF_SUBGENRE, MF_CHARACTERS, MF_REMARKS, MF_LITERATURE
+    MF_GENRE, MF_SUBGENRE, MF_CHARACTERS, MF_REMARKS, MF_LITERATURE, MF_HAS_TRANSCRIPTION
 
 wb = load_workbook("/Users/jong/prj/translatin/download/TransLatin_Manifestations.xlsx")
 ic(wb.sheetnames)
@@ -20,24 +20,36 @@ ic(pers.split('_x000B_'))  # vertical tab \u000B encoded
 
 
 def create_manifestations(cursor):
-    # for i in range(1, sheet.max_column + 1):
-    #     ic(sheet.cell(row=1, column=i).value)
-
+    # iterate over all rows after title row
     for row in sheet.iter_rows(min_row=2, values_only=True):
-        man = {
-            'origin': row[MF_ORIGIN],
-            'earliest': row[MF_EARLIEST],
-            'latest': row[MF_LATEST],
-            'fingerprint': row[MF_FINGERPRINT],
-            'form': row[MF_FORM],
-            'form_type': row[MF_FORM_TYPE],
-            'genre': row[MF_GENRE],
-            'subgenre': row[MF_SUBGENRE],
-            'characters': row[MF_CHARACTERS],
-            'remarks': row[MF_REMARKS],
-            'literature': row[MF_LITERATURE]
-        }
-        ic(man)
+        # mandatory fields, usable 'as is'
+        man = {'origin': ic(row[MF_ORIGIN]),
+               'earliest': row[MF_EARLIEST],
+               'latest': row[MF_LATEST],
+               'fingerprint': row[MF_FINGERPRINT],
+               'form_type': row[MF_FORM_TYPE]}
+
+        # mandatory field requiring a massage: 'has_transcription'. Defaults to False for empty cells,
+        # has 'YES' for True and '?' for to-be-determined which is NULL in db
+        if row[MF_HAS_TRANSCRIPTION]:
+            man['has_transcription'] = True if row[MF_HAS_TRANSCRIPTION] == 'YES' else None
+        else:
+            man['has_transcription'] = False
+
+        # optional fields
+        if row[MF_FORM]:
+            man['form'] = row[MF_FORM]
+        if row[MF_GENRE]:
+            man['genre'] = row[MF_GENRE]
+        if row[MF_SUBGENRE]:
+            man['subgenre'] = row[MF_SUBGENRE]
+        if row[MF_CHARACTERS]:
+            man['characters'] = row[MF_CHARACTERS]
+        if row[MF_REMARKS]:
+            man['remarks'] = row[MF_REMARKS]
+        if row[MF_LITERATURE]:
+            man['literature'] = row[MF_LITERATURE]
+
         save_manifestation(cursor, man)
 
 
@@ -51,11 +63,8 @@ def save_manifestation(cursor, man):
     values = [man[column] for column in columns]
     data = (AsIs(','.join(columns)), tuple(values))
 
-    ic(cursor.mogrify(stmt, data))
+    # ic(cursor.mogrify(stmt, data))
     cursor.execute(stmt, data)
-
-    count = cursor.rowcount
-    ic(count, "Record inserted")
 
 
 def show_titles():
