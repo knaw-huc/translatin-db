@@ -5,11 +5,12 @@ from openpyxl import load_workbook
 
 import psycopg2.extras
 from psycopg2.extensions import AsIs
+from psycopg2.extras import execute_values
 
 import uuid
 
-from mapping import MF_ORIGIN, MF_EARLIEST, MF_LATEST, MF_FINGERPRINT, MF_FORM, MF_FORM_TYPE, \
-    MF_GENRE, MF_SUBGENRE, MF_CHARACTERS, MF_REMARKS, MF_LITERATURE, MF_HAS_TRANSCRIPTION
+from mapping import MF_ORIGIN, MF_CENETON_FROM, MF_CENETON_UPTO, MF_EARLIEST, MF_LATEST, MF_FINGERPRINT, \
+    MF_FORM, MF_FORM_TYPE, MF_GENRE, MF_SUBGENRE, MF_CHARACTERS, MF_REMARKS, MF_LITERATURE, MF_HAS_TRANSCRIPTION
 
 wb = load_workbook("/Users/jong/prj/translatin/download/TransLatin_Manifestations.xlsx")
 ic(wb.sheetnames)
@@ -53,6 +54,9 @@ def create_manifestations(cursor):
         if row[MF_LITERATURE]:
             man['literature'] = row[MF_LITERATURE]
 
+        ceneton_ids = [row[cid] for cid in range(MF_CENETON_FROM, MF_CENETON_UPTO) if row[cid]]
+        man['_ceneton'] = list(dict.fromkeys(ceneton_ids))  # remove duplicates, maintaining original insertion order
+
         save_manifestation(cursor, man)
 
 
@@ -62,12 +66,16 @@ def save_manifestation(cursor, man):
 
     stmt = 'INSERT INTO manifestations (%s) VALUES %s'
 
-    columns = man.keys()
+    columns = [column for column in man.keys() if not column.startswith('_')]
     values = [man[column] for column in columns]
     data = (AsIs(','.join(columns)), tuple(values))
 
     # ic(cursor.mogrify(stmt, data))
     cursor.execute(stmt, data)
+
+    stmt = 'INSERT INTO manifestation_ceneton (manifestation_id, ceneton_id) VALUES %s'
+    data = [(man['id'], cid) for cid in man['_ceneton']]
+    execute_values(cursor, stmt, data)
 
 
 def show_titles():
