@@ -1,0 +1,14 @@
+translatin=# select sub.ceneton_count,count(*) from (select distinct(manifestation_id),count(*) as ceneton_count from manifestation_ceneton group by manifestation_id) sub group by sub.ceneton_count;
+ ceneton_count | count
+---------------+-------
+             3 |     1
+             2 |   108
+             1 |  2140
+(3 rows)
+
+translatin=# select sub.title_count,count(*) from (select distinct(manifestation_id),count(*) as title_count from manifestation_titles group by manifestation_id) sub group by sub.title_count;
+ title_count | count
+-------------+-------
+           2 |    71
+           1 |  2178
+(2 rows)
