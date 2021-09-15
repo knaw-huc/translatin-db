@@ -8,38 +8,60 @@ from psycopg2.extensions import AsIs
 
 import uuid
 
+from mapping import MF_ORIGIN, MF_EARLIEST, MF_LATEST, MF_FINGERPRINT, MF_FORM, MF_FORM_TYPE, \
+    MF_GENRE, MF_SUBGENRE, MF_CHARACTERS, MF_REMARKS, MF_LITERATURE
 
 wb = load_workbook("/Users/jong/prj/translatin/download/TransLatin_Manifestations.xlsx")
 ic(wb.sheetnames)
 
-it = wb['Blad1']
-pers = ic(it['CH39'].value)
+sheet = wb['Blad1']
+pers = ic(sheet['CH39'].value)
 ic(pers.split('_x000B_'))  # vertical tab \u000B encoded
 
 
-def save_manifestation(curs, man):
+def create_manifestations(cursor):
+    # for i in range(1, sheet.max_column + 1):
+    #     ic(sheet.cell(row=1, column=i).value)
+
+    for row in sheet.iter_rows(min_row=2, values_only=True):
+        man = {
+            'origin': row[MF_ORIGIN],
+            'earliest': row[MF_EARLIEST],
+            'latest': row[MF_LATEST],
+            'fingerprint': row[MF_FINGERPRINT],
+            'form': row[MF_FORM],
+            'form_type': row[MF_FORM_TYPE],
+            'genre': row[MF_GENRE],
+            'subgenre': row[MF_SUBGENRE],
+            'characters': row[MF_CHARACTERS],
+            'remarks': row[MF_REMARKS],
+            'literature': row[MF_LITERATURE]
+        }
+        ic(man)
+        save_manifestation(cursor, man)
+
+
+def save_manifestation(cursor, man):
+    if 'id' not in man:
+        man['id'] = uuid.uuid4()
+
+    stmt = 'INSERT INTO manifestations (%s) VALUES %s'
+
     columns = man.keys()
     values = [man[column] for column in columns]
-    stmt = 'INSERT INTO manifestations (%s) VALUES %s'
     data = (AsIs(','.join(columns)), tuple(values))
-    ic(curs.mogrify(stmt, data))
-    curs.execute(stmt, data)
-    conn.commit()
-    count = curs.rowcount
+
+    ic(cursor.mogrify(stmt, data))
+    cursor.execute(stmt, data)
+
+    count = cursor.rowcount
     ic(count, "Record inserted")
-    return curs.fetchone()
 
 
-def mock():
-    record = {}
-    record['id'] = uuid.uuid4()
-    record['earliest'] = '1511-01-01'
-    record['latest'] = '1511-12-31'
-    record['form'] = None
-    record['form_type'] = 'Full edition'
-    record['genre'] = ''
-    # return {'earliest': '1511-01-01', 'form_type': 'Full edition', 'latest': '1511-12-31', 'id': uuid.uuid4()}
-    return record
+def show_titles():
+    for row in sheet.iter_rows(min_row=1, max_row=1, values_only=True):
+        for i in range(0, len(row)):
+            print(f"col[{i}]={row[i]}")
 
 
 conn = None
@@ -54,7 +76,9 @@ try:
         curs.execute("select version()")
         version = curs.fetchone()
         ic(version)
-        ic(save_manifestation(curs, mock()))
+        # save_manifestation(curs, mock())
+        create_manifestations(curs)
+        conn.commit()
 except (Exception, psycopg2.DatabaseError) as error:
     print(error)
 finally:
