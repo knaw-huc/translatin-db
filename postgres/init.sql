@@ -19,6 +19,7 @@ create type form_type as enum (
 drop table if exists manifestations cascade;
 create table manifestations (
     id uuid primary key,
+    origin text not null, -- "M1 .. M2249 in Jirsi's Excel sheet"
     earliest date not null,
     latest date not null,
     form form,
@@ -31,6 +32,7 @@ create table manifestations (
     literature text,
     remarks text
 );
+create unique index on manifestations(origin);
 
 drop type if exists languages cascade;
 create type languages as enum (
