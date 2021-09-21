@@ -102,7 +102,8 @@ create table authors (
     death_place smallint,
     occupation text,
     religion text,
-    image text
+    image text,
+    wikidata text
 );
 create unique index on authors (name);
 create unique index on authors (origin);
