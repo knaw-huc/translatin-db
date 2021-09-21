@@ -12,7 +12,7 @@ import uuid
 from mapping.authors import AUTHOR_ORIGIN, AUTHOR_STD_NAME, AUTHOR_TYPE, \
     AUTHOR_BIRTH_EARLIEST, AUTHOR_BIRTH_LATEST, AUTHOR_BIRTH_PLACE, \
     AUTHOR_DEATH_EARLIEST, AUTHOR_DEATH_LATEST, AUTHOR_DEATH_PLACE, \
-    AUTHOR_ALT_NAME_FROM, AUTHOR_ALT_NAME_UPTO
+    AUTHOR_ALT_NAME_FROM, AUTHOR_ALT_NAME_UPTO, AUTHOR_OCCUPATION
 
 wb = load_workbook("/Users/jong/prj/translatin/download/TransLatin_Authors.xlsx")
 ic(wb.sheetnames)
@@ -48,6 +48,7 @@ def create_authors(cursor):
                 'type': row[AUTHOR_TYPE]
             }
 
+            # birth related data
             if row[AUTHOR_BIRTH_EARLIEST]:
                 author['birth_earliest'] = date.fromisoformat(row[AUTHOR_BIRTH_EARLIEST])
             if row[AUTHOR_BIRTH_LATEST]:
@@ -55,12 +56,17 @@ def create_authors(cursor):
             if row[AUTHOR_BIRTH_PLACE]:
                 author['_birth_place'] = row[AUTHOR_BIRTH_PLACE]
 
+            # death related data
             if row[AUTHOR_DEATH_EARLIEST]:
                 author['death_earliest'] = date.fromisoformat(row[AUTHOR_DEATH_EARLIEST])
             if row[AUTHOR_DEATH_LATEST]:
                 author['death_latest'] = date.fromisoformat(row[AUTHOR_DEATH_LATEST])
             if row[AUTHOR_BIRTH_PLACE]:
                 author['_death_place'] = row[AUTHOR_DEATH_PLACE]
+
+            if row[AUTHOR_OCCUPATION]:
+                author['occupation'] = row[AUTHOR_OCCUPATION] # TODO: split on ';' and convert to 1:n relationship?
+
 
             # 1:n relationship with alternative literal names
             names = [row[i] for i in range(AUTHOR_ALT_NAME_FROM, AUTHOR_ALT_NAME_UPTO) if row[i]]

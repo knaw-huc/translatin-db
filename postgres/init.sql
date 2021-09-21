@@ -99,7 +99,8 @@ create table authors (
     birth_place smallint,
     death_earliest date,
     death_latest date,
-    death_place smallint
+    death_place smallint,
+    occupation text
 );
 create unique index on authors (name);
 create unique index on authors (origin);
