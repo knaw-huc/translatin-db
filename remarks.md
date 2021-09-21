@@ -197,3 +197,7 @@
 1.  `ic| 'FIXING DUPLICATE: ',
     origin: 'M2122'
     list: ['Esther', 'Esther']`
+
+
+## file: TransLatin_Authors.xlsx
+1.  contains 992 superfluous (empty) columns. This breaks 'Numbers' when trying to open the sheet.
