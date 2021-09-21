@@ -131,6 +131,14 @@ create table author_viaf_links (
     foreign key (author_id) references authors (id)
 );
 
+drop table if exists author_nta_links cascade;
+create table author_nta_links (
+    author_id uuid not null,
+    nta text not null,
+    primary key (author_id, nta),
+    foreign key (author_id) references authors (id)
+);
+
 drop table if exists authors_manifestations cascade;
 create table authors_manifestations (
     author_id uuid not null,
