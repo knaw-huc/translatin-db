@@ -96,13 +96,19 @@ create table authors (
     type author_types not null,
     birth_earliest date,
     birth_latest date,
-    birth_place text,
+    birth_place smallint,
     death_earliest date,
     death_latest date,
-    death_place text
+    death_place smallint
 );
 create unique index on authors (name);
-create unique index on authors (excel_id);
+create unique index on authors (origin);
+
+drop table if exists places cascade;
+create table places (
+    id smallserial primary key,
+    name text
+);
 
 drop table if exists authors_manifestations cascade;
 create table authors_manifestations (
