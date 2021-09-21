@@ -65,8 +65,7 @@ def create_authors(cursor):
                 author['_death_place'] = row[AUTHOR_DEATH_PLACE]
 
             if row[AUTHOR_OCCUPATION]:
-                author['occupation'] = row[AUTHOR_OCCUPATION] # TODO: split on ';' and convert to 1:n relationship?
-
+                author['occupation'] = row[AUTHOR_OCCUPATION]  # split on ';' and convert to 1:n relationship?
 
             # 1:n relationship with alternative literal names
             names = [row[i] for i in range(AUTHOR_ALT_NAME_FROM, AUTHOR_ALT_NAME_UPTO) if row[i]]
@@ -108,7 +107,6 @@ def create_author(cursor, author):
     stmt = 'INSERT INTO author_names (author_id, name) VALUES %s'
     data = [(author['id'], name) for name in author['_names']]
     execute_values(cursor, stmt, data)
-
 
 
 conn = None
