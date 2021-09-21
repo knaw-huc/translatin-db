@@ -205,12 +205,14 @@
 
 * Sheet contains 992 superfluous (empty) columns. This breaks 'Numbers' when trying to open the sheet.
 
+1. `rows '6' vs '135': duplicate key value violates unique constraint "authors_name_idx" 
+    DETAIL:  Key (name)=(Augustinians of Gent) already exists.`
 1. `ic| row[AUTHOR_ORIGIN]: '85'
     "illegal date": 'illegal date'
     err: day is out of range for month: 1557-07-32`
-2.  `ic| row[AUTHOR_ORIGIN]: '92'
+1. `ic| row[AUTHOR_ORIGIN]: '92'
     "illegal date": 'illegal date'
     err: Invalid isoformat string: 'ca.1586'`
-3. `ic| row[AUTHOR_ORIGIN]: '99'
+1. `ic| row[AUTHOR_ORIGIN]: '99'
     "illegal date": 'illegal date'
     err: Invalid isoformat string: '158512-31'`
