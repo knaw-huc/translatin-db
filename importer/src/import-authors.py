@@ -13,6 +13,7 @@ from mapping.authors import AUTHOR_ORIGIN, AUTHOR_STD_NAME, AUTHOR_TYPE, \
     AUTHOR_BIRTH_EARLIEST, AUTHOR_BIRTH_LATEST, AUTHOR_BIRTH_PLACE, \
     AUTHOR_DEATH_EARLIEST, AUTHOR_DEATH_LATEST, AUTHOR_DEATH_PLACE, \
     AUTHOR_ALT_NAME_FROM, AUTHOR_ALT_NAME_UPTO, AUTHOR_OCCUPATION, \
+    AUTHOR_VIAF_FROM, AUTHOR_VIAF_UPTO, \
     AUTHOR_RELIGION, AUTHOR_IMAGE, AUTHOR_WIKIDATA
 
 wb = load_workbook("/Users/jong/prj/translatin/download/TransLatin_Authors.xlsx")
@@ -81,6 +82,10 @@ def create_authors(cursor):
             names = [row[i] for i in range(AUTHOR_ALT_NAME_FROM, AUTHOR_ALT_NAME_UPTO) if row[i]]
             author['_names'] = fix_duplicates(row[AUTHOR_ORIGIN], names)
 
+            # 1:n relationship with VIAF links
+            viaf = [row[i] for i in range(AUTHOR_VIAF_FROM, AUTHOR_VIAF_UPTO) if row[i]]
+            author['_viaf_links'] = fix_duplicates(row[AUTHOR_ORIGIN], viaf)
+
             create_author(cursor, author)
         except ValueError as err:
             ic(row[AUTHOR_ORIGIN], "illegal date", err)
@@ -116,6 +121,10 @@ def create_author(cursor, author):
 
     stmt = 'INSERT INTO author_names (author_id, name) VALUES %s'
     data = [(author['id'], name) for name in author['_names']]
+    execute_values(cursor, stmt, data)
+
+    stmt = 'INSERT INTO author_viaf_links (author_id, viaf) VALUES %s'
+    data = [(author['id'], viaf) for viaf in author['_viaf_links']]
     execute_values(cursor, stmt, data)
 
 
