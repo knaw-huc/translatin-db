@@ -13,7 +13,7 @@ from mapping.authors import AUTHOR_ORIGIN, AUTHOR_STD_NAME, AUTHOR_TYPE, \
     AUTHOR_BIRTH_EARLIEST, AUTHOR_BIRTH_LATEST, AUTHOR_BIRTH_PLACE, \
     AUTHOR_DEATH_EARLIEST, AUTHOR_DEATH_LATEST, AUTHOR_DEATH_PLACE, \
     AUTHOR_ALT_NAME_FROM, AUTHOR_ALT_NAME_UPTO, AUTHOR_OCCUPATION, \
-    AUTHOR_RELIGION
+    AUTHOR_RELIGION, AUTHOR_IMAGE
 
 wb = load_workbook("/Users/jong/prj/translatin/download/TransLatin_Authors.xlsx")
 ic(wb.sheetnames)
@@ -70,6 +70,9 @@ def create_authors(cursor):
 
             if row[AUTHOR_RELIGION]:
                 author['religion'] = row[AUTHOR_RELIGION]  # convert to enum type?
+
+            if row[AUTHOR_IMAGE]:
+                author['image'] = row[AUTHOR_IMAGE]
 
             # 1:n relationship with alternative literal names
             names = [row[i] for i in range(AUTHOR_ALT_NAME_FROM, AUTHOR_ALT_NAME_UPTO) if row[i]]

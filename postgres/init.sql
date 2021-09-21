@@ -101,7 +101,8 @@ create table authors (
     death_latest date,
     death_place smallint,
     occupation text,
-    religion text
+    religion text,
+    image text
 );
 create unique index on authors (name);
 create unique index on authors (origin);
