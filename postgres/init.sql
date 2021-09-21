@@ -94,6 +94,9 @@ create table authors (
     name text not null,
     origin smallint not null, -- "1 .. 147 in Jirsi's Excel sheet"
     type author_types not null,
+    first_name text,
+    prefix text,
+    surname text,
     birth_earliest date,
     birth_latest date,
     birth_place smallint,

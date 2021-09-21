@@ -10,6 +10,7 @@ from psycopg2.extras import execute_values
 import uuid
 
 from mapping.authors import AUTHOR_ORIGIN, AUTHOR_STD_NAME, AUTHOR_TYPE, \
+    AUTHOR_FIRST_NAME, AUTHOR_PREFIX, AUTHOR_SURNAME, \
     AUTHOR_BIRTH_EARLIEST, AUTHOR_BIRTH_LATEST, AUTHOR_BIRTH_PLACE, \
     AUTHOR_DEATH_EARLIEST, AUTHOR_DEATH_LATEST, AUTHOR_DEATH_PLACE, \
     AUTHOR_ALT_NAME_FROM, AUTHOR_ALT_NAME_UPTO, AUTHOR_OCCUPATION, \
@@ -49,6 +50,14 @@ def create_authors(cursor):
                 'name': row[AUTHOR_STD_NAME],
                 'type': row[AUTHOR_TYPE]
             }
+
+            # PNV name related data
+            if row[AUTHOR_FIRST_NAME]:
+                author['first_name'] = row[AUTHOR_FIRST_NAME]
+            if row[AUTHOR_PREFIX]:
+                author['prefix'] = row[AUTHOR_PREFIX]
+            if row[AUTHOR_SURNAME]:
+                author['surname'] = row[AUTHOR_SURNAME]
 
             # birth related data
             if row[AUTHOR_BIRTH_EARLIEST]:
