@@ -92,8 +92,17 @@ drop table if exists authors cascade;
 create table authors (
     id uuid primary key,
     name text not null,
-    type author_types not null
+    origin smallint not null, -- "1 .. 147 in Jirsi's Excel sheet"
+    type author_types not null,
+    birth_earliest date,
+    birth_latest date,
+    birth_place text,
+    death_earliest date,
+    death_latest date,
+    death_place text
 );
+create unique index on authors (name);
+create unique index on authors (excel_id);
 
 drop table if exists authors_manifestations cascade;
 create table authors_manifestations (
