@@ -141,6 +141,11 @@ def create_author(cursor, author):
         # ic(cursor.mogrify(stmt, data))
         cursor.execute(stmt, data)
 
+    if '_death_place' in author:
+        stmt = 'UPDATE authors SET death_place = (SELECT id from places WHERE name = %s) WHERE id = %s'
+        data = (author['_death_place'], author_id)
+        cursor.execute(stmt, data)
+
     stmt = 'INSERT INTO author_names (author_id, name) VALUES %s'
     data = [(author['id'], name) for name in author['_names']]
     execute_values(cursor, stmt, data)
