@@ -109,6 +109,7 @@ create table places (
     id smallserial primary key,
     name text
 );
+create unique index on places (name);
 
 drop table if exists authors_manifestations cascade;
 create table authors_manifestations (
