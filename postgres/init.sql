@@ -1,4 +1,4 @@
-drop type if exists form;
+drop type if exists form cascade;
 create type form as enum (
     'First Printing',
     'Fragment',
@@ -10,7 +10,7 @@ create type form as enum (
     'Synopsis (printed)'
 );
 
-drop type if exists form_type;
+drop type if exists form_type cascade;
 create type form_type as enum (
     'Fragment',
     'Full edition',
@@ -86,7 +86,7 @@ create table manifestation_titles (
 );
 
 drop type if exists author_types cascade;
-create type author_types as enum ('person', 'organisation');
+create type author_types as enum ('Person', 'Organization');
 
 drop table if exists authors cascade;
 create table authors (
