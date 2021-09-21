@@ -9,16 +9,18 @@ from psycopg2.extras import execute_values
 
 import uuid
 
-from mapping import MF_ORIGIN, MF_CENETON_FROM, MF_CENETON_UPTO, MF_EARLIEST, MF_LATEST, MF_FINGERPRINT, \
-    MF_LANG_FROM, MF_LANG_UPTO, MF_TITLE_FROM, MF_TITLE_UPTO, MF_FORM, MF_FORM_TYPE, MF_GENRE, MF_SUBGENRE, \
-    MF_CHARACTERS, MF_REMARKS, MF_LITERATURE, MF_HAS_TRANSCRIPTION
+from mapping.manifestations import MF_ORIGIN, MF_CENETON_FROM, MF_CENETON_UPTO, MF_EARLIEST, MF_LATEST, \
+    MF_FINGERPRINT, MF_LANG_FROM, MF_LANG_UPTO, MF_TITLE_FROM, MF_TITLE_UPTO, MF_FORM, MF_FORM_TYPE, MF_GENRE, \
+    MF_SUBGENRE, MF_CHARACTERS, MF_REMARKS, MF_LITERATURE, MF_HAS_TRANSCRIPTION
 
 wb = load_workbook("/Users/jong/prj/translatin/download/TransLatin_Manifestations.xlsx")
 ic(wb.sheetnames)
 
 sheet = wb['Blad1']
-pers = ic(sheet['CH39'].value)
-ic(pers.split('_x000B_'))  # vertical tab \u000B encoded
+
+
+# pers = ic(sheet['CH39'].value)
+# ic(pers.split('_x000B_'))  # vertical tab \u000B encoded
 
 
 def create_manifestations(cursor):
