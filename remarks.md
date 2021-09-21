@@ -1,12 +1,14 @@
 # Singularities
 
-## Form
+## file: TransLatin_Manifestations.xlsx
+
+### Form
 1.  `ic| 'FIXING FORM: ', origin: 'M884', form: 'Synopsis (gedrukt)'`
 
-## Language
+### Language
 1.  `ic| 'FIXING LANGUAGE: ', origin: 'M1052', lang: 'Nederlands'`
 
-## Duplicates
+### Duplicates
 1.  `ic| 'FIXING DUPLICATE: ',
     origin: 'M246'
     list: ['Haema-Christias, van het H. Bloet ons Heeren Iesv Christi',
@@ -199,5 +201,16 @@
     list: ['Esther', 'Esther']`
 
 
-## file: TransLatin_Authors.xlsx
-1.  contains 992 superfluous (empty) columns. This breaks 'Numbers' when trying to open the sheet.
+### file: TransLatin_Authors.xlsx
+
+* Sheet contains 992 superfluous (empty) columns. This breaks 'Numbers' when trying to open the sheet.
+
+1. `ic| row[AUTHOR_ORIGIN]: '85'
+    "illegal date": 'illegal date'
+    err: day is out of range for month: 1557-07-32`
+2.  `ic| row[AUTHOR_ORIGIN]: '92'
+    "illegal date": 'illegal date'
+    err: Invalid isoformat string: 'ca.1586'`
+3. `ic| row[AUTHOR_ORIGIN]: '99'
+    "illegal date": 'illegal date'
+    err: Invalid isoformat string: '158512-31'`
