@@ -111,6 +111,14 @@ create table places (
 );
 create unique index on places (name);
 
+drop table if exists author_names cascade;
+create table author_names (
+    author_id uuid not null,
+    name text not null,
+    primary key (author_id, name),
+    foreign key (author_id) references authors (id)
+);
+
 drop table if exists authors_manifestations cascade;
 create table authors_manifestations (
     author_id uuid not null,

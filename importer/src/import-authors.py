@@ -11,7 +11,8 @@ import uuid
 
 from mapping.authors import AUTHOR_ORIGIN, AUTHOR_STD_NAME, AUTHOR_TYPE, \
     AUTHOR_BIRTH_EARLIEST, AUTHOR_BIRTH_LATEST, AUTHOR_BIRTH_PLACE, \
-    AUTHOR_DEATH_EARLIEST, AUTHOR_DEATH_LATEST, AUTHOR_DEATH_PLACE
+    AUTHOR_DEATH_EARLIEST, AUTHOR_DEATH_LATEST, AUTHOR_DEATH_PLACE, \
+    AUTHOR_ALT_NAME_FROM, AUTHOR_ALT_NAME_UPTO
 
 wb = load_workbook("/Users/jong/prj/translatin/download/TransLatin_Authors.xlsx")
 ic(wb.sheetnames)
@@ -61,9 +62,20 @@ def create_authors(cursor):
             if row[AUTHOR_BIRTH_PLACE]:
                 author['_death_place'] = row[AUTHOR_DEATH_PLACE]
 
+            # 1:n relationship with alternative literal names
+            names = [row[i] for i in range(AUTHOR_ALT_NAME_FROM, AUTHOR_ALT_NAME_UPTO) if row[i]]
+            author['_names'] = fix_duplicates(row[AUTHOR_ORIGIN], names)
+
             create_author(cursor, author)
         except ValueError as err:
             ic(row[AUTHOR_ORIGIN], "illegal date", err)
+
+
+def fix_duplicates(origin, some_list):
+    normalised = list(dict.fromkeys(some_list))  # as of Python 3.7 also maintains original insertion order
+    if normalised != some_list:
+        ic('FIXING DUPLICATE: ', origin, some_list)
+    return normalised
 
 
 def create_author(cursor, author):
@@ -86,6 +98,12 @@ def create_author(cursor, author):
         data = (author['_birth_place'], author_id)
         # ic(cursor.mogrify(stmt, data))
         cursor.execute(stmt, data)
+
+    stmt = 'INSERT INTO author_names (author_id, name) VALUES %s'
+    data = [(author['id'], name) for name in author['_names']]
+    execute_values(cursor, stmt, data)
+
+
 
 conn = None
 try:
