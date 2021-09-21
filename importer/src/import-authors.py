@@ -21,6 +21,8 @@ wb = load_workbook("/Users/jong/prj/translatin/download/TransLatin_Authors.xlsx"
 ic(wb.sheetnames)
 sheet = wb['Authors']
 
+unique_names = set()
+
 
 def show_titles():
     for row in sheet.iter_rows(min_row=1, max_row=1, values_only=True):
@@ -44,10 +46,21 @@ def collect_places(cursor):
 def create_authors(cursor):
     from datetime import date
     for row in sheet.iter_rows(min_row=2, values_only=True):  # skip title row
+        origin = row[AUTHOR_ORIGIN]
+        name = row[AUTHOR_STD_NAME]
+        ic(origin, name)
+
+        # avoid postgres zapping us on duplicate names
+        if name in unique_names:
+            ic('DUPLICATE NAME', origin, name)
+            continue
+
+        unique_names.add(name)
+
         try:
             author = {
-                'origin': ic(row[AUTHOR_ORIGIN]),
-                'name': row[AUTHOR_STD_NAME],
+                'origin': origin,
+                'name': name,
                 'type': row[AUTHOR_TYPE]
             }
 
@@ -112,10 +125,6 @@ def fix_duplicates(origin, some_list):
 
 
 def create_author(cursor, author):
-    # skip orgs for now
-    if author['type'] == 'Organization':
-        return
-
     if 'id' not in author:
         author['id'] = uuid.uuid4()
 
