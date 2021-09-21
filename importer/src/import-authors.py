@@ -142,7 +142,7 @@ def create_author(cursor, author):
         cursor.execute(stmt, data)
 
     if '_death_place' in author:
-        stmt = 'UPDATE authors SET death_place = (SELECT id from places WHERE name = %s) WHERE id = %s'
+        stmt = 'UPDATE authors SET death_place = (SELECT id FROM places WHERE name = %s) WHERE id = %s'
         data = (author['_death_place'], author_id)
         cursor.execute(stmt, data)
 
