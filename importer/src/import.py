@@ -74,8 +74,6 @@ def create_manifestations(cursor):
         create_manifestation(cursor, man)
 
 
-
-
 def fix_form(form):
     if form == 'Synopsis (gedrukt)':
         return 'Synopsis (printed)'
