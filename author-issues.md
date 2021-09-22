@@ -2,7 +2,6 @@
     origin: 'M8'
     name: 'Petrus Nannius'
     type: 'Person'`
-
 2. `ic| 'UNKNOWN AUTHOR+TYPE':
     origin: 'M126'
     name: 'Cornelius Laurimanus'
