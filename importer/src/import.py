@@ -7,6 +7,8 @@ import psycopg2.extras
 from psycopg2.extensions import AsIs
 from psycopg2.extras import execute_values
 
+from util import fix_duplicates
+
 import uuid
 
 from mapping.manifestations import MF_ORIGIN, MF_CENETON_FROM, MF_CENETON_UPTO, MF_EARLIEST, MF_LATEST, \
@@ -72,11 +74,6 @@ def create_manifestations(cursor):
         create_manifestation(cursor, man)
 
 
-def fix_duplicates(origin, some_list):
-    normalised = list(dict.fromkeys(some_list))  # as of Python 3.7 also maintains original insertion order
-    if normalised != some_list:
-        ic('FIXING DUPLICATE: ', origin, some_list)
-    return normalised
 
 
 def fix_form(form):
@@ -112,12 +109,6 @@ def create_manifestation(cursor, man):
     stmt = 'INSERT INTO manifestation_languages (manifestation_id, language, certainty) VALUES %s'
     data = [(man['id'], lang, cert) for lang, cert in man['_languages']]
     execute_values(cursor, stmt, data)
-
-
-def show_titles():
-    for row in sheet.iter_rows(min_row=1, max_row=1, values_only=True):
-        for i in range(0, len(row)):
-            print(f"col[{i}]={row[i]}")
 
 
 conn = None
