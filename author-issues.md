@@ -214,12 +214,11 @@
      origin: 'M2163'
      name: 'Johannes Baptistes Gramaius'
      type: 'Person'`
-55. 
-`ic| 'UNKNOWN AUTHOR+TYPE':
+55. `ic| 'UNKNOWN AUTHOR+TYPE':
     origin: 'M2165'
     name: 'Johannes Baptistes Gramaius'
     type: 'Person'`
-1. `ic| 'UNKNOWN AUTHOR+TYPE':
-    origin: 'M2249'
-    name: 'Anonymous'
-    type: 'Person'`
+56. `ic| 'UNKNOWN AUTHOR+TYPE':
+     origin: 'M2249'
+     name: 'Anonymous'
+     type: 'Person'`
