@@ -39,7 +39,7 @@
      origin: 'M237'
      name: 'Haarlemse rederijker'
      type: 'Person'`
-11. `ic| 'AUTHOR EXISTS WITH DIFFERENT TYPE': 'AUTHOR EXISTS WITH DIFFERENT TYPE'
+11. `ic| 'AUTHOR EXISTS WITH DIFFERENT TYPE':
       origin: 'M237'
       name: 'Haarlemse rederijker'`
 12. `ic| 'UNKNOWN AUTHOR+TYPE':
