@@ -145,11 +145,7 @@ def create_manifestation(cursor, man):
                 %s)
             '''
             data = (author_name, author_type, man['id'])
-            ic(cursor.mogrify(stmt, data))
-            try:
-                cursor.execute(stmt, data)
-            except Exception as db_err:
-                ic('AUTHOR FAIL', db_err)
+            cursor.execute(stmt, data)
 
 
 conn = None
