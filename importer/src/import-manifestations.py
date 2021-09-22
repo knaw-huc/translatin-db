@@ -12,8 +12,8 @@ from util import fix_duplicates
 import uuid
 
 from mapping.manifestations import MF_ORIGIN, MF_CENETON_FROM, MF_CENETON_UPTO, MF_EARLIEST, MF_LATEST, \
-    MF_FINGERPRINT, MF_LANG_FROM, MF_LANG_UPTO, MF_TITLE_FROM, MF_TITLE_UPTO, MF_FORM, MF_FORM_TYPE, MF_GENRE, \
-    MF_SUBGENRE, MF_CHARACTERS, MF_REMARKS, MF_LITERATURE, MF_HAS_TRANSCRIPTION
+    MF_AUTHOR_FROM, MF_AUTHOR_UPTO, MF_FINGERPRINT, MF_LANG_FROM, MF_LANG_UPTO, MF_TITLE_FROM, MF_TITLE_UPTO, \
+    MF_FORM, MF_FORM_TYPE, MF_GENRE, MF_SUBGENRE, MF_CHARACTERS, MF_REMARKS, MF_LITERATURE, MF_HAS_TRANSCRIPTION
 
 wb = load_workbook("/Users/jong/prj/translatin/download/TransLatin_Manifestations.xlsx")
 ic(wb.sheetnames)
@@ -71,7 +71,35 @@ def create_manifestations(cursor):
         languages = [(fix_language(row[i]), row[i + 1]) for i in range(MF_LANG_FROM, MF_LANG_UPTO, 2) if row[i]]
         man['_languages'] = fix_duplicates(row[MF_ORIGIN], languages)
 
+        # 1:n relationship with authors. As these are linked by name in Excel, authors MUST be imported first!
+        # Also keep track of author type ('Person', 'Organization') as this must match during lookup in db.
+        authors = [(row[i], row[i + 1]) for i in range(MF_AUTHOR_FROM, MF_AUTHOR_UPTO, 2) if row[i]]
+        man['_authors'] = fix_authors(cursor, row[MF_ORIGIN], authors)
+
         create_manifestation(cursor, man)
+
+
+def fix_authors(cursor, origin, authors):
+    unique_names = set()
+    fixed_authors = list()
+
+    for (author_name, author_type) in authors:
+        if author_name in unique_names:
+            ic('DUPLICATE AUTHOR NAME', origin, author_name)
+            continue
+
+        cursor.execute('SELECT EXISTS(SELECT 1 FROM authors WHERE name = %s AND type = %s)',
+                       (author_name, author_type))
+        if not cursor.fetchone()[0]:
+            ic('UNKNOWN AUTHOR+TYPE', origin, author_name, author_type)
+            cursor.execute('SELECT EXISTS(SELECT 1 FROM authors WHERE name = %s)', (author_name,))
+            if cursor.fetchone()[0]:
+                ic('AUTHOR EXISTS WITH DIFFERENT TYPE', origin, author_name)
+            continue
+
+        fixed_authors.append((author_name, author_type))
+
+    return fixed_authors
 
 
 def fix_form(form):
@@ -107,6 +135,21 @@ def create_manifestation(cursor, man):
     stmt = 'INSERT INTO manifestation_languages (manifestation_id, language, certainty) VALUES %s'
     data = [(man['id'], lang, cert) for lang, cert in man['_languages']]
     execute_values(cursor, stmt, data)
+
+    if '_authors' in man:
+        for (author_name, author_type) in man['_authors']:
+            ic(author_name, author_type)
+            stmt = '''
+            INSERT INTO authors_manifestations (author_id, manifestation_id) VALUES (
+                (SELECT id FROM authors WHERE name = %s AND type = %s),
+                %s)
+            '''
+            data = (author_name, author_type, man['id'])
+            ic(cursor.mogrify(stmt, data))
+            try:
+                cursor.execute(stmt, data)
+            except Exception as db_err:
+                ic('AUTHOR FAIL', db_err)
 
 
 conn = None
