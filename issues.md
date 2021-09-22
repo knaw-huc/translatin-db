@@ -216,3 +216,6 @@
 4. `ic| row[AUTHOR_ORIGIN]: '99'
     "illegal date": 'illegal date'
     err: Invalid isoformat string: '158512-31'`
+
+* Unknown authors, and authors with type mismatch (Person in Manifestations file vs Organization in Authors file).
+See [Author Issues](author-issues.md) 
