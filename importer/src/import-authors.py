@@ -160,7 +160,6 @@ try:
         curs.execute("select version()")
         version = curs.fetchone()
         ic(version)
-        # save_manifestation(curs, mock())
         collect_places(curs)
         conn.commit()
         create_authors(curs)
