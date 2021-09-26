@@ -156,12 +156,12 @@ drop table if exists publishers cascade;
 create table publishers (
     id uuid primary key,
     name text not null,
-    wed_erven text not null,    -- create optional enum type ('Wed', 'Erven', 'Both')?
-    first_name text,            -- empty for publishers
-    patronym text,              -- e.g., jansz.
-    prefix text,                -- e.g., 'de', 'vander'
-    addition text not null,     -- e.g., (i) (ii)
-    surname text not null      -- equal to 'name' for publishers (e.g., Elzevier)
+    wed_erven text,         -- create optional enum type ('Wed', 'Erven', 'Both')?
+    first_name text,        -- empty for publishers
+    patronym text,          -- e.g., 'jansz.'
+    prefix text,            -- e.g., 'de', 'vander'
+    addition text,          -- e.g., (i) (ii)
+    surname text not null   -- equal to 'name' for publishers (e.g., Elzevier)
 );
 create unique index on publishers (name);
 
