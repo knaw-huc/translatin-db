@@ -154,8 +154,25 @@ create unique index on authors_manifestations (manifestation_id, author_id);
 
 drop table if exists publishers cascade;
 create table publishers (
-    id uuid primary key
+    id uuid primary key,
+    name text not null,
+    wed_erven text not null,    -- create optional enum type ('Wed', 'Erven', 'Both')?
+    first_name text,            -- empty for publishers
+    patronym text,              -- e.g., jansz.
+    prefix text,                -- e.g., 'de', 'vander'
+    addition text not null,     -- e.g., (i) (ii)
+    surname text not null      -- equal to 'name' for publishers (e.g., Elzevier)
 );
+create unique index on publishers (name);
+
+drop table if exists publisher_alt_names cascade;
+create table publisher_alt_names (
+    publisher_id uuid not null,
+    name text not null,
+    primary key (publisher_id, name),
+    foreign key (publisher_id) references publishers (id)
+);
+create unique index on publisher_alt_names (name, publisher_id);
 
 drop table if exists manifestations_publishers cascade;
 create table manifestations_publishers (
