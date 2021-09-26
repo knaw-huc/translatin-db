@@ -1,0 +1,12 @@
+col[0]=Standardized_Name_Printer_Publisher1
+col[1]=Wed./Erven
+col[2]=First_Name
+col[3]=Patronym
+col[4]=Prefix
+col[5]=Surname
+col[6]=Addition
+col[7]=Alternative_Name1
+col[8]=Alternative_Name2
+col[9]=Alternative_Name3
+col[10]=Alternative_Name4
+col[11]=Alternative_Name5
