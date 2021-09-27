@@ -165,14 +165,14 @@ create table publishers (
 );
 create unique index on publishers (name);
 
-drop table if exists publisher_alt_names cascade;
-create table publisher_alt_names (
+drop table if exists publisher_names cascade;
+create table publisher_names (
     publisher_id uuid not null,
     name text not null,
     primary key (publisher_id, name),
     foreign key (publisher_id) references publishers (id)
 );
-create unique index on publisher_alt_names (name, publisher_id);
+create unique index on publisher_names (name, publisher_id);
 
 drop table if exists manifestations_publishers cascade;
 create table manifestations_publishers (
