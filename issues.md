@@ -201,7 +201,7 @@
      list: ['Esther', 'Esther']`
 
 
-### file: TransLatin_Authors.xlsx
+## file: TransLatin_Authors.xlsx
 
 * Sheet contains 992 superfluous (empty) columns. This breaks 'Numbers' when trying to open the sheet.
 
@@ -238,4 +238,5 @@ with names found in Printers_Publishers:
 This is not easy to fix heuristically
 
 # Entity Relationship Diagram
+
 * [Very (very) rough and incomplete sketch (WIP)](https://kroki.io/erd/svg/eNqNUk1Lw0AQve-vWOotacB69CbiwUNFRPEQSpgk02Rgsym7E7CW_nc3mzYfNVRvu_Pem3nzwcQK5UFBiupeLt4NaKuAScvPp_WzfNJMvI_esI3V2pa0kzlBYaBaLKWlb3Siu9vFUYibjkxohYjXoGmLlr1qIwLK5VCkaShfSl2z1I1SThvUhgpXsmdM5MlL7Tgl2IRbd5mhXRse2GldKwTtSAhGOQM8YDkwOsDZnwuLOEON7C2G1aQo5SI4ge49KBm_eOxdxAp00UCBGzGT4gwOCfrIeAAZGgbSvB94h8cutpQf-gQfp4W53d1sVW_yiuWHhsva_LmXLRnLiYYK3QDPrzAlw2WyU5BhWyzMEcZ_Eftnl7zPbStQyjU43btPKOLXJlVkSzQXov8Zcpc3vk93fl17MoyilfRmRrfSmneZrlB8P-2YJlcoV1EUytNFzEF-GxdAEEWBPC_8AgtbUWfjNxLIfiY_MatBbw==)
