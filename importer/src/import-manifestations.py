@@ -89,7 +89,7 @@ def fix_publishers(cursor, origin, publishers):
     unique_names = set()
     fixed_publishers = list()
 
-    for (publisher_name) in publishers:
+    for publisher_name in publishers:
         if publisher_name in unique_names:
             ic('DUPLICATE PUBLISHER', origin, publisher_name)
             continue
