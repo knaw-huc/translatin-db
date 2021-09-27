@@ -13,7 +13,8 @@ import uuid
 
 from mapping.manifestations import MF_ORIGIN, MF_CENETON_FROM, MF_CENETON_UPTO, MF_EARLIEST, MF_LATEST, \
     MF_AUTHOR_FROM, MF_AUTHOR_UPTO, MF_FINGERPRINT, MF_LANG_FROM, MF_LANG_UPTO, MF_TITLE_FROM, MF_TITLE_UPTO, \
-    MF_FORM, MF_FORM_TYPE, MF_GENRE, MF_SUBGENRE, MF_CHARACTERS, MF_REMARKS, MF_LITERATURE, MF_HAS_TRANSCRIPTION
+    MF_FORM, MF_FORM_TYPE, MF_PUBLISHER_FROM, MF_PUBLISHER_UPTO, MF_GENRE, MF_SUBGENRE, MF_CHARACTERS, MF_REMARKS, \
+    MF_LITERATURE, MF_HAS_TRANSCRIPTION
 
 wb = load_workbook("/Users/jong/prj/translatin/download/TransLatin_Manifestations.xlsx")
 ic(wb.sheetnames)
@@ -75,6 +76,11 @@ def create_manifestations(cursor):
         # Also keep track of author type ('Person', 'Organization') as this must match during lookup in db.
         authors = [(row[i], row[i + 1]) for i in range(MF_AUTHOR_FROM, MF_AUTHOR_UPTO, 2) if row[i]]
         man['_authors'] = fix_authors(cursor, row[MF_ORIGIN], authors)
+
+        # 1:n relationship with publishers/printers.
+        # These are also linked by name in Excel, so publishers MUST be imported first.
+        publishers = [row[i] for i in range(MF_PUBLISHER_FROM, MF_PUBLISHER_UPTO) if row[i]]
+        man['_publishers'] = fix_duplicates(row[MF_ORIGIN], publishers)
 
         create_manifestation(cursor, man)
 
@@ -145,6 +151,26 @@ def create_manifestation(cursor, man):
                 %s)
             '''
             data = (author_name, author_type, man['id'])
+            cursor.execute(stmt, data)
+
+    if '_publishers' in man:
+        for publisher_name in man['_publishers']:
+            ic(publisher_name)
+            stmt = '''
+            INSERT INTO manifestations_publishers (manifestation_id, publisher_id) VALUES (
+                %s,
+                (SELECT id FROM publishers WHERE replace(replace(name, '  ', ' '), 'erfgenamen', 'erven') = %s))
+            '''
+            data = (man['id'], publisher_name
+                    .strip()
+                    .replace('  ', ' ')
+                    .replace('iusius', 'ius')
+                    .replace('Cleyn,', 'Cleyn')
+                    .replace('jean weins', 'Jean Weins')
+                    .replace('Wed. Peter de Cleyn', 'Wed. Pieter de Cleyn')
+                    .replace('Wed. en erven Hendrick Thieullier', 'Wed. en erven Henri Thieullier')
+                    )
+            ic(cursor.mogrify(stmt, data))
             cursor.execute(stmt, data)
 
 

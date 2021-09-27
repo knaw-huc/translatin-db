@@ -219,3 +219,20 @@
 
 * Unknown authors, and authors with type mismatch (Person in Manifestations file vs Organization in Authors file).
 See [Author Issues](author-issues.md) 
+
+## file: TransLatin_Printers_Publishers.xlsx
+
+An impression of mismatches / fixes needed to map printers/publishers found in Manifestations
+with names found in Printers_Publishers:
+
+1. `.strip()`                    # trailing whitespace
+2. `.replace('  ', ' ')`         # two spaces vs single space
+3. `.replace('iusius', 'ius')`   # 'Steelsiusius'
+4. `.replace('Cleyn,', 'Cleyn')` # trailing comma
+5. `.replace('jean weins', 'Jean Weins')`    # capitalisation mismatch
+6. `.replace('Wed. Peter de Cleyn', 'Wed. Pieter de Cleyn')`   # first name mismatch
+7. `.replace('Wed. en erven Hendrick Thieullier', 'Wed. en erven Henri Thieullier')`
+8. `Smith & Walford` vs `Smith` and `Walford` # single record with ampersand vs two separate records
+9. ...
+
+This is not easy to fix heuristically
