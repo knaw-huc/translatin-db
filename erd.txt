@@ -1,0 +1,50 @@
+title {label: "Translatin WEMI Entity-Relationship diagram", size: "20"}
+
+# Entities
+
+[Manifestation]
+*id  {label: "uuid, not null"}
+*origin {label: "Manifestation_No"}
+has_transcription {label: "boolean"}
+earliest {label: "date"}
+latest {label: "date"}
+
+[ceneton]
+*+manifestation_id
+*ceneton_id {label: "text not null"}
+
+[language]
++manifestation_id
+*language {label: "language not null"}
+*certainty {label: "{Certain, Uncertain} not null"}
+
+[title]
++manifestation_id
+*text {label: "text not null"}
+
+[Author]
+*id  {label: "uuid, not null"}
+first_name
+last_name
++birth_place_id
++death_place_id
+
+[place]
+*id {label: "smallint, not null"}
+*name
+
+[Publisher]
+*id {label: "uuid, not null"}
+first_name
+last_name
+
+# Relationships
+
+Author +--1 place {label: "birth"}
+Author +--1 place {label: "death"}
+
+Manifestation 1--+ ceneton
+Manifestation 1--+ title
+Manifestation *--* language
+Manifestation +--+ Author
+Manifestation +--* Publisher
