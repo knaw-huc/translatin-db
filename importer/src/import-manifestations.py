@@ -93,6 +93,8 @@ def fix_publishers(cursor, origin, publishers):
         if publisher_name in unique_names:
             ic('DUPLICATE PUBLISHER', origin, publisher_name)
             continue
+        else:
+            unique_names.add(publisher_name)
 
         cursor.execute('SELECT EXISTS(SELECT 1 FROM publishers WHERE name = %s)', (publisher_name,))
         if not cursor.fetchone()[0]:
@@ -112,6 +114,8 @@ def fix_authors(cursor, origin, authors):
         if author_name in unique_names:
             ic('DUPLICATE AUTHOR NAME', origin, author_name)
             continue
+        else:
+            unique_names.add(author_name)
 
         cursor.execute('SELECT EXISTS(SELECT 1 FROM authors WHERE name = %s AND type = %s)',
                        (author_name, author_type))
