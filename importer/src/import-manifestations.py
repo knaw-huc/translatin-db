@@ -80,9 +80,28 @@ def create_manifestations(cursor):
         # 1:n relationship with publishers/printers.
         # These are also linked by name in Excel, so publishers MUST be imported first.
         publishers = [row[i] for i in range(MF_PUBLISHER_FROM, MF_PUBLISHER_UPTO) if row[i]]
-        man['_publishers'] = fix_duplicates(row[MF_ORIGIN], publishers)
+        man['_publishers'] = fix_publishers(cursor, row[MF_ORIGIN], publishers)
 
         create_manifestation(cursor, man)
+
+
+def fix_publishers(cursor, origin, publishers):
+    unique_names = set()
+    fixed_publishers = list()
+
+    for (publisher_name) in publishers:
+        if publisher_name in unique_names:
+            ic('DUPLICATE PUBLISHER', origin, publisher_name)
+            continue
+
+        cursor.execute('SELECT EXISTS(SELECT 1 FROM publishers WHERE name = %s)', (publisher_name,))
+        if not cursor.fetchone()[0]:
+            ic('UNKNOWN PUBLISHER NAME', origin, publisher_name)
+            continue
+
+        fixed_publishers.append(publisher_name)
+
+    return fixed_publishers
 
 
 def fix_authors(cursor, origin, authors):
@@ -159,17 +178,9 @@ def create_manifestation(cursor, man):
             stmt = '''
             INSERT INTO manifestations_publishers (manifestation_id, publisher_id) VALUES (
                 %s,
-                (SELECT id FROM publishers WHERE replace(replace(name, '  ', ' '), 'erfgenamen', 'erven') = %s))
+                (SELECT id FROM publishers WHERE name = %s))
             '''
-            data = (man['id'], publisher_name
-                    .strip()
-                    .replace('  ', ' ')
-                    .replace('iusius', 'ius')
-                    .replace('Cleyn,', 'Cleyn')
-                    .replace('jean weins', 'Jean Weins')
-                    .replace('Wed. Peter de Cleyn', 'Wed. Pieter de Cleyn')
-                    .replace('Wed. en erven Hendrick Thieullier', 'Wed. en erven Henri Thieullier')
-                    )
+            data = (man['id'], publisher_name)
             ic(cursor.mogrify(stmt, data))
             cursor.execute(stmt, data)
 
@@ -186,7 +197,6 @@ try:
         curs.execute("select version()")
         version = curs.fetchone()
         ic(version)
-        # save_manifestation(curs, mock())
         create_manifestations(curs)
         conn.commit()
 except (Exception, psycopg2.DatabaseError) as error:
