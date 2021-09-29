@@ -235,6 +235,8 @@ with names found in Printers_Publishers:
 8. `Smith & Walford` vs `Smith` and `Walford` # single record with ampersand vs two separate records
 9. ...
 
+See [Publisher Issues](publisher-issues.md) 
+
 This is not easy to fix heuristically
 
 # Entity Relationship Diagram
