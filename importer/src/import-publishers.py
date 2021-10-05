@@ -15,7 +15,7 @@ from mapping.printers import PP_STD_NAME, PP_WED_ERVEN, \
     PP_FIRST_NAME, PP_PATRONYM, PP_PREFIX, PP_SURNAME, PP_ADDITION, \
     PP_ALT_NAMES_FROM, PP_ALT_NAMES_UPTO
 
-wb = load_workbook("/Users/jong/prj/translatin/download/TransLatin_Printers_Publishers.xlsx")
+wb = load_workbook('/Users/jong/prj/translatin/download/2021-10-04/TransLatin_Printers_Publishers.xlsx')
 ic(wb.sheetnames)
 sheet = wb['Blad1']
 

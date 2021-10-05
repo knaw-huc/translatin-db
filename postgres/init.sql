@@ -20,11 +20,12 @@ create type form_type as enum (
 drop table if exists manifestations cascade;
 create table manifestations (
     id uuid primary key,
-    origin text not null, -- "M1 .. M2249 in Jirsi's Excel sheet"
+    origin text not null, -- 'M1 .. M2249 in TransLatin_Manifestations.xlsx'
     earliest date not null,
     latest date not null,
     form form,
     form_type form_type not null,
+    is_anonymous boolean not null,
     genre text,
     subgenre text,
     has_transcription boolean, -- 'YES, NO, ? = NULL'
@@ -92,7 +93,7 @@ drop table if exists authors cascade;
 create table authors (
     id uuid primary key,
     name text not null,
-    origin smallint not null, -- "1 .. 147 in Jirsi's Excel sheet"
+    origin smallint not null, -- '1 .. 147 in TransLatin_Authors.xlsx'
     type author_types not null,
     first_name text,
     prefix text,

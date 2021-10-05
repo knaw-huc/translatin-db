@@ -16,7 +16,7 @@ from mapping.manifestations import MF_ORIGIN, MF_CENETON_FROM, MF_CENETON_UPTO, 
     MF_FORM, MF_FORM_TYPE, MF_PUBLISHER_FROM, MF_PUBLISHER_UPTO, MF_GENRE, MF_SUBGENRE, MF_CHARACTERS, MF_REMARKS, \
     MF_LITERATURE, MF_HAS_TRANSCRIPTION
 
-wb = load_workbook("/Users/jong/prj/translatin/download/TransLatin_Manifestations.xlsx")
+wb = load_workbook('/Users/jong/prj/translatin/download/2021-10-04/TransLatin_Manifestations.xlsx')
 ic(wb.sheetnames)
 
 sheet = wb['Blad1']
@@ -75,7 +75,11 @@ def create_manifestations(cursor):
         # 1:n relationship with authors. As these are linked by name in Excel, authors MUST be imported first!
         # Also keep track of author type ('Person', 'Organization') as this must match during lookup in db.
         authors = [(row[i], row[i + 1]) for i in range(MF_AUTHOR_FROM, MF_AUTHOR_UPTO, 2) if row[i]]
-        man['_authors'] = fix_authors(cursor, row[MF_ORIGIN], authors)
+        if ('Anonymous', 'Unknown') in authors:
+            man['is_anonymous'] = True
+        else:
+            man['is_anonymous'] = False
+            man['_authors'] = fix_authors(cursor, row[MF_ORIGIN], authors)
 
         # 1:n relationship with publishers/printers.
         # These are also linked by name in Excel, so publishers MUST be imported first.
@@ -185,7 +189,6 @@ def create_manifestation(cursor, man):
                 (SELECT id FROM publishers WHERE name = %s))
             '''
             data = (man['id'], publisher_name)
-            ic(cursor.mogrify(stmt, data))
             cursor.execute(stmt, data)
 
 
