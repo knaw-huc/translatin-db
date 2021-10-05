@@ -12,7 +12,7 @@ from util import fix_duplicates
 import uuid
 
 from mapping.manifestations import MF_ORIGIN, MF_CENETON_FROM, MF_CENETON_UPTO, MF_EARLIEST, MF_LATEST, \
-    MF_AUTHOR_FROM, MF_AUTHOR_UPTO, MF_FINGERPRINT, MF_LANG_FROM, MF_LANG_UPTO, MF_TITLE_FROM, MF_TITLE_UPTO, \
+    MF_AUTHOR_FROM, MF_AUTHOR_UPTO, MF_FINGERPRINT, MF_TITLE_FROM, MF_LANG_FROM, MF_CERT_FROM, MF_TITLE_UPTO, \
     MF_FORM, MF_FORM_TYPE, MF_PUBLISHER_FROM, MF_PUBLISHER_UPTO, MF_GENRE, MF_SUBGENRE, MF_CHARACTERS, MF_REMARKS, \
     MF_LITERATURE, MF_HAS_TRANSCRIPTION
 
@@ -64,13 +64,10 @@ def create_manifestations(cursor):
         ceneton_ids = [row[i] for i in range(MF_CENETON_FROM, MF_CENETON_UPTO) if row[i]]
         man['_ceneton'] = fix_duplicates(row[MF_ORIGIN], ceneton_ids)
 
-        # 1:n relationship with titles
-        titles = [row[i] for i in range(MF_TITLE_FROM, MF_TITLE_UPTO) if row[i]]
-        man['_titles'] = fix_duplicates(row[MF_ORIGIN], titles)
-
-        # 1:n relationship with (language, certainty) aka 'Language' pairs
-        languages = [(fix_language(row[i]), row[i + 1]) for i in range(MF_LANG_FROM, MF_LANG_UPTO, 2) if row[i]]
-        man['_languages'] = fix_duplicates(row[MF_ORIGIN], languages)
+        # 1:n relationship with titles which are {certain,uncertain} to be of a specific language
+        titles = [(row[MF_TITLE_FROM + i], row[MF_LANG_FROM + (2 * i)], row[MF_CERT_FROM + (2 * i)])
+                  for i in range(0, MF_TITLE_UPTO - MF_TITLE_FROM) if row[MF_TITLE_FROM + i]]
+        man['_titles'] = titles
 
         # 1:n relationship with authors. As these are linked by name in Excel, authors MUST be imported first!
         # Also keep track of author type ('Person', 'Organization') as this must match during lookup in db.
@@ -161,13 +158,13 @@ def create_manifestation(cursor, man):
     data = [(man['id'], cid) for cid in man['_ceneton']]
     execute_values(cursor, stmt, data)
 
-    stmt = 'INSERT INTO manifestation_titles (manifestation_id, title) VALUES %s'
-    data = [(man['id'], title) for title in man['_titles']]
+    stmt = 'INSERT INTO manifestation_titles (manifestation_id, title, language, certainty) VALUES %s'
+    data = [(man['id'], title, lang, cert) for title, lang, cert in man['_titles']]
     execute_values(cursor, stmt, data)
 
-    stmt = 'INSERT INTO manifestation_languages (manifestation_id, language, certainty) VALUES %s'
-    data = [(man['id'], lang, cert) for lang, cert in man['_languages']]
-    execute_values(cursor, stmt, data)
+    # stmt = 'INSERT INTO manifestation_languages (manifestation_id, language, certainty) VALUES %s'
+    # data = [(man['id'], lang, cert) for lang, cert in man['_languages']]
+    # execute_values(cursor, stmt, data)
 
     if '_authors' in man:
         for (author_name, author_type) in man['_authors']:

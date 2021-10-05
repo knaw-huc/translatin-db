@@ -60,29 +60,22 @@ create type languages as enum (
 drop type if exists certainty cascade;
 create type certainty as enum ('Certain', 'Uncertain');
 
-drop table if exists manifestation_languages cascade;
-create table manifestation_languages (
+drop table if exists manifestation_titles cascade;
+create table manifestation_titles (
     manifestation_id uuid not null,
+    title text not null,
     language languages not null,
     certainty certainty not null,
-    unique (manifestation_id, language, certainty),
+    primary key (manifestation_id, title, language),
     foreign key (manifestation_id) references manifestations (id)
 );
-create index on manifestation_languages (manifestation_id);
+create index on manifestation_titles (language, certainty);
 
 drop table if exists manifestation_ceneton cascade;
 create table manifestation_ceneton (
     manifestation_id uuid not null,
     ceneton_id text not null,
     primary key (manifestation_id, ceneton_id),
-    foreign key (manifestation_id) references manifestations (id)
-);
-
-drop table if exists manifestation_titles cascade;
-create table manifestation_titles (
-    manifestation_id uuid not null,
-    title text not null,
-    primary key (manifestation_id, title),
     foreign key (manifestation_id) references manifestations (id)
 );
 
