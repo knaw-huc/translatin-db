@@ -16,7 +16,7 @@ from mapping.manifestations import MF_ORIGIN, MF_CENETON_FROM, MF_CENETON_UPTO, 
     MF_FORM, MF_FORM_TYPE, MF_PUBLISHER_FROM, MF_PUBLISHER_UPTO, MF_GENRE, MF_SUBGENRE, MF_CHARACTERS, MF_REMARKS, \
     MF_LITERATURE, MF_HAS_TRANSCRIPTION
 
-wb = load_workbook('/Users/jong/prj/translatin/download/2021-10-04/TransLatin_Manifestations.xlsx')
+wb = load_workbook('/Users/jong/prj/translatin/download/2021-10-05/TransLatin_Manifestations.xlsx')
 ic(wb.sheetnames)
 
 sheet = wb['Blad1']
@@ -46,7 +46,7 @@ def create_manifestations(cursor):
 
         # optional fields
         if row[MF_FORM]:
-            man['form'] = fix_form(row[MF_FORM])
+            man['form'] = row[MF_FORM]
         if row[MF_FINGERPRINT]:
             man['fingerprint'] = row[MF_FINGERPRINT]
         if row[MF_GENRE]:
@@ -130,18 +130,6 @@ def fix_authors(cursor, origin, authors):
         fixed_authors.append((author_name, author_type))
 
     return fixed_authors
-
-
-def fix_form(form):
-    if form == 'Synopsis (gedrukt)':
-        return 'Synopsis (printed)'
-    return form
-
-
-def fix_language(lang):
-    if lang == 'Nederlands':
-        return 'Dutch'
-    return lang
 
 
 def create_manifestation(cursor, man):

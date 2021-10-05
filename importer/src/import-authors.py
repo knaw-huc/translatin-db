@@ -19,9 +19,9 @@ from mapping.authors import AUTHOR_ORIGIN, AUTHOR_STD_NAME, AUTHOR_TYPE, \
     AUTHOR_VIAF_FROM, AUTHOR_VIAF_UPTO, AUTHOR_NTA_FROM, AUTHOR_NTA_UPTO, \
     AUTHOR_RELIGION, AUTHOR_IMAGE, AUTHOR_WIKIDATA
 
-wb = load_workbook('/Users/jong/prj/translatin/download/2021-10-04/TransLatin_Authors_Fixed.xlsx')
+wb = load_workbook('/Users/jong/prj/translatin/download/2021-10-05/TransLatin_Authors.xlsx')
 ic(wb.sheetnames)
-sheet = wb['Authors']
+sheet = wb['Blad1']
 
 unique_names = set()
 
