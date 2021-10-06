@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import configparser
 from icecream import ic
 from openpyxl import load_workbook
 
@@ -15,7 +16,10 @@ from mapping.printers import PP_STD_NAME, PP_WED_ERVEN, \
     PP_FIRST_NAME, PP_PATRONYM, PP_PREFIX, PP_SURNAME, PP_ADDITION, \
     PP_ALT_NAMES_FROM, PP_ALT_NAMES_UPTO
 
-wb = load_workbook('/Users/jong/prj/translatin/download/2021-10-05/TransLatin_Printers_Publishers.xlsx')
+config = configparser.ConfigParser(interpolation=configparser.ExtendedInterpolation())
+config.read('config.ini')
+file = ic(config['files']['publishers'])
+wb = load_workbook(file)
 ic(wb.sheetnames)
 sheet = wb['Blad1']
 

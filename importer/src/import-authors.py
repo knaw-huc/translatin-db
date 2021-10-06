@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import configparser
 from icecream import ic
 from openpyxl import load_workbook
 
@@ -19,7 +20,10 @@ from mapping.authors import AUTHOR_ORIGIN, AUTHOR_STD_NAME, AUTHOR_TYPE, \
     AUTHOR_VIAF_FROM, AUTHOR_VIAF_UPTO, AUTHOR_NTA_FROM, AUTHOR_NTA_UPTO, \
     AUTHOR_RELIGION, AUTHOR_IMAGE, AUTHOR_WIKIDATA
 
-wb = load_workbook('/Users/jong/prj/translatin/download/2021-10-05/TransLatin_Authors.xlsx')
+config = configparser.ConfigParser(interpolation=configparser.ExtendedInterpolation())
+config.read('config.ini')
+file = ic(config['files']['authors'])
+wb = load_workbook(file)
 ic(wb.sheetnames)
 sheet = wb['Blad1']
 

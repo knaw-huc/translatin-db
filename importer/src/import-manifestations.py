@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import configparser
 from icecream import ic
 from openpyxl import load_workbook
 
@@ -16,7 +17,10 @@ from mapping.manifestations import MF_ORIGIN, MF_CENETON_FROM, MF_CENETON_UPTO, 
     MF_FORM, MF_FORM_TYPE, MF_PUBLISHER_FROM, MF_PUBLISHER_UPTO, MF_GENRE, MF_SUBGENRE, MF_CHARACTERS, MF_REMARKS, \
     MF_LITERATURE, MF_HAS_TRANSCRIPTION
 
-wb = load_workbook('/Users/jong/prj/translatin/download/2021-10-05/TransLatin_Manifestations.xlsx')
+config = configparser.ConfigParser(interpolation=configparser.ExtendedInterpolation())
+config.read('config.ini')
+file = ic(config['files']['manifestations'])
+wb = load_workbook(file)
 ic(wb.sheetnames)
 
 sheet = wb['Blad1']
