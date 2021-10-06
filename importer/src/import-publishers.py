@@ -81,10 +81,7 @@ def create_publisher(cursor, publisher):
 try:
     print("Connecting to translatin database...")
     psycopg2.extras.register_uuid()
-    conn = psycopg2.connect(host="localhost",
-                            database="translatin",
-                            user="translatin",
-                            password="translatin")
+    conn = psycopg2.connect(**parser['db'])
     with conn.cursor() as curs:
         curs.execute("select version()")
         version = curs.fetchone()
