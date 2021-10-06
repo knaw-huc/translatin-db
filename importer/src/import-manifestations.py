@@ -15,7 +15,8 @@ import uuid
 from mapping.manifestations import MF_ORIGIN, MF_CENETON_FROM, MF_CENETON_UPTO, MF_EARLIEST, MF_LATEST, \
     MF_AUTHOR_FROM, MF_AUTHOR_UPTO, MF_FINGERPRINT, MF_TITLE_FROM, MF_LANG_FROM, MF_CERT_FROM, MF_TITLE_UPTO, \
     MF_FORM, MF_FORM_TYPE, MF_PUBLISHER_FROM, MF_PUBLISHER_UPTO, MF_GENRE, MF_SUBGENRE, MF_CHARACTERS, MF_REMARKS, \
-    MF_LITERATURE, MF_HAS_TRANSCRIPTION
+    MF_LITERATURE, MF_HAS_DRAMAWEB_TRANSCRIPTION, MF_EXTERNAL_SCAN_URL, MF_CENETON_SCAN_URL, \
+    MF_CENETON_TRANSCRIPTION_URL
 
 parser = configparser.ConfigParser(interpolation=configparser.ExtendedInterpolation())
 parser.read('config.ini')
@@ -42,10 +43,13 @@ def create_manifestations(cursor):
 
         # mandatory field requiring a massage: 'has_transcription'. Defaults to False for empty cells,
         # has 'YES' for True and '?' for to-be-determined which is NULL in db
-        if row[MF_HAS_TRANSCRIPTION]:
-            man['has_transcription'] = True if row[MF_HAS_TRANSCRIPTION] == 'YES' else None
+        if row[MF_HAS_DRAMAWEB_TRANSCRIPTION]:
+            man['has_dramaweb_transcription'] = True if row[MF_HAS_DRAMAWEB_TRANSCRIPTION] == 'YES' else None
         else:
-            man['has_transcription'] = False
+            man['has_dramaweb_transcription'] = False
+
+        # for now we assume that if there is a transcription, we also have the scan
+        man['has_dramaweb_scan'] = man['has_dramaweb_transcription']
 
         # optional fields
         if row[MF_FORM]:
@@ -62,6 +66,29 @@ def create_manifestations(cursor):
             man['remarks'] = row[MF_REMARKS]
         if row[MF_LITERATURE]:
             man['literature'] = row[MF_LITERATURE]
+        if row[MF_CENETON_SCAN_URL]:
+            val = row[MF_CENETON_SCAN_URL]
+            if len(val) < 8:
+                ic(row[MF_ORIGIN], 'SUSPICIOUSLY SHORT CENETON SCAN REF', val)
+            if '_x000B_' in val:
+                ic('VERTICAL SPACE (\\v, 0x0b) in:', val)
+                val = val.replace('_x000B_', '')
+            man['ceneton_scan'] = f'https://www.let.leidenuniv.nl/Dutch/Ceneton/Facsimiles/{val}'
+            ic(man['ceneton_scan'])
+        if row[MF_CENETON_TRANSCRIPTION_URL]:
+            val = ic(row[MF_CENETON_TRANSCRIPTION_URL])
+            if len(val) < 8:
+                ic(row[MF_ORIGIN], 'SUSPICIOUSLY SHORT CENETON TRANSCRIPTION REF', val)
+            if '_x000B_' in val:
+                ic(row[MF_ORIGIN], 'VERTICAL SPACE (\\v, 0x0b) in:', val)
+                val = val.replace('_x000B_', '')
+            man['ceneton_transcription'] = f'https://www.let.leidenuniv.nl/Dutch/Ceneton/{val}.html'
+            ic(man['ceneton_transcription'])
+        if row[MF_EXTERNAL_SCAN_URL]:
+            man['external_scan'] = row[MF_EXTERNAL_SCAN_URL]
+
+        # not in excel sheet, assume false. Can manually be set to True. Perhaps make this 'text' to hold URLs?
+        man['external_transcription'] = False
 
         # 1:n relationship with Ceneton identifiers
         ceneton_ids = [row[i] for i in range(MF_CENETON_FROM, MF_CENETON_UPTO) if row[i]]

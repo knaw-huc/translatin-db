@@ -28,7 +28,12 @@ create table manifestations (
     is_anonymous boolean not null,
     genre text,
     subgenre text,
-    has_transcription boolean, -- 'YES, NO, ? = NULL'
+    has_dramaweb_scan boolean,                  -- internal: somewhere in project there is a scan (column Y)
+    has_dramaweb_transcription boolean,         -- internal: transcription was made in this project (column Y)
+    ceneton_scan text,                          -- optional url, taken from column 'BD'
+    ceneton_transcription text,                 -- optional url, taken from column 'BE'
+    external_scan text,                         -- optional url, taken from column 'AM'
+    external_transcription boolean not null,    -- not in excel, always false to start, can manually set to true
     fingerprint text,
     characters text,
     literature text,
