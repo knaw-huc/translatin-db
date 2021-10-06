@@ -153,10 +153,6 @@ def create_manifestation(cursor, man):
     data = [(man['id'], title, lang, cert) for title, lang, cert in man['_titles']]
     execute_values(cursor, stmt, data)
 
-    # stmt = 'INSERT INTO manifestation_languages (manifestation_id, language, certainty) VALUES %s'
-    # data = [(man['id'], lang, cert) for lang, cert in man['_languages']]
-    # execute_values(cursor, stmt, data)
-
     if '_authors' in man:
         for (author_name, author_type) in man['_authors']:
             ic(author_name, author_type)
