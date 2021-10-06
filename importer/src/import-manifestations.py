@@ -17,13 +17,12 @@ from mapping.manifestations import MF_ORIGIN, MF_CENETON_FROM, MF_CENETON_UPTO, 
     MF_FORM, MF_FORM_TYPE, MF_PUBLISHER_FROM, MF_PUBLISHER_UPTO, MF_GENRE, MF_SUBGENRE, MF_CHARACTERS, MF_REMARKS, \
     MF_LITERATURE, MF_HAS_TRANSCRIPTION
 
-config = configparser.ConfigParser(interpolation=configparser.ExtendedInterpolation())
-config.read('config.ini')
-file = ic(config['files']['manifestations'])
-wb = load_workbook(file)
+parser = configparser.ConfigParser(interpolation=configparser.ExtendedInterpolation())
+parser.read('config.ini')
+conf = parser['manifestations']
+wb = load_workbook(ic(conf['path']))
 ic(wb.sheetnames)
-
-sheet = wb['Blad1']
+sheet = wb[conf['name']]
 
 
 # pers = ic(sheet['CH39'].value)

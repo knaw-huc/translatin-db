@@ -16,12 +16,12 @@ from mapping.printers import PP_STD_NAME, PP_WED_ERVEN, \
     PP_FIRST_NAME, PP_PATRONYM, PP_PREFIX, PP_SURNAME, PP_ADDITION, \
     PP_ALT_NAMES_FROM, PP_ALT_NAMES_UPTO
 
-config = configparser.ConfigParser(interpolation=configparser.ExtendedInterpolation())
-config.read('config.ini')
-file = ic(config['files']['publishers'])
-wb = load_workbook(file)
+parser = configparser.ConfigParser(interpolation=configparser.ExtendedInterpolation())
+parser.read('config.ini')
+conf = parser['publishers']
+wb = load_workbook(ic(conf['path']))
 ic(wb.sheetnames)
-sheet = wb['Blad1']
+sheet = wb[conf['name']]
 
 # show_titles(sheet)
 

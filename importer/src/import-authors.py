@@ -20,12 +20,12 @@ from mapping.authors import AUTHOR_ORIGIN, AUTHOR_STD_NAME, AUTHOR_TYPE, \
     AUTHOR_VIAF_FROM, AUTHOR_VIAF_UPTO, AUTHOR_NTA_FROM, AUTHOR_NTA_UPTO, \
     AUTHOR_RELIGION, AUTHOR_IMAGE, AUTHOR_WIKIDATA
 
-config = configparser.ConfigParser(interpolation=configparser.ExtendedInterpolation())
-config.read('config.ini')
-file = ic(config['files']['authors'])
-wb = load_workbook(file)
+parser = configparser.ConfigParser(interpolation=configparser.ExtendedInterpolation())
+parser.read('config.ini')
+conf = parser['authors']
+wb = load_workbook(ic(conf['path']))
 ic(wb.sheetnames)
-sheet = wb['Blad1']
+sheet = wb[conf['name']]
 
 unique_names = set()
 
