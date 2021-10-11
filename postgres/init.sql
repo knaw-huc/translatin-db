@@ -35,7 +35,6 @@ create table manifestations (
     external_scan text,                         -- optional url, taken from column 'AM'
     external_transcription boolean not null,    -- not in excel, always false to start, can manually set to true
     fingerprint text,
-    characters text,
     literature text,
     remarks text
 );
