@@ -61,7 +61,12 @@ def create_manifestations(cursor):
         if row[MF_SUBGENRE]:
             man['subgenre'] = row[MF_SUBGENRE]
         if row[MF_CHARACTERS]:
-            man['characters'] = row[MF_CHARACTERS]
+            # compound cell that has 'personages' separated by '_x000B_'
+            personages = row[MF_CHARACTERS].split('_x000B_')
+            # sometimes starts with '(Geen afzonderlijke lijst van personages)' which we then remove
+            if personages[0] == '(Geen afzonderlijke lijst van personages)':  # can only remove() if it actually exists
+                personages.remove('(Geen afzonderlijke lijst van personages)')
+            man['_personages'] = fix_duplicates(row[MF_ORIGIN], personages)
         if row[MF_REMARKS]:
             man['remarks'] = row[MF_REMARKS]
         if row[MF_LITERATURE]:
@@ -179,6 +184,12 @@ def create_manifestation(cursor, man):
     stmt = 'INSERT INTO manifestation_titles (manifestation_id, title, language, certainty) VALUES %s'
     data = [(man['id'], title, lang, cert) for title, lang, cert in man['_titles']]
     execute_values(cursor, stmt, data)
+
+    if '_personages' in man:
+        stmt = 'INSERT INTO manifestation_personages (manifestation_id, name) VALUES %s'
+        data = [(man['id'], name) for name in man['_personages'] if name]
+        ic(data)
+        execute_values(cursor, stmt, data)
 
     if '_authors' in man:
         for (author_name, author_type) in man['_authors']:

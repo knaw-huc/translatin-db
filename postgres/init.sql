@@ -41,6 +41,16 @@ create table manifestations (
 );
 create unique index on manifestations(origin);
 
+-- called 'personages' instead of 'character(s)' to avoid conflict with Postgres type 'character'
+drop table if exists manifestation_personages;
+create table manifestation_personages (
+    manifestation_id uuid not null,
+    name text not null,
+    primary key (manifestation_id,name),
+    foreign key (manifestation_id) references manifestations (id)
+);
+create index on manifestation_personages (name);
+
 drop type if exists languages cascade;
 create type languages as enum (
 -- this is MvdP's list of languages used in Translatin, taken from Confluence page
@@ -124,6 +134,7 @@ create table author_names (
     primary key (author_id, name),
     foreign key (author_id) references authors (id)
 );
+create index on author_names (name);
 
 drop table if exists author_viaf_links cascade;
 create table author_viaf_links (
