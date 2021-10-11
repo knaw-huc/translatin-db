@@ -64,7 +64,7 @@ def create_manifestations(cursor):
             # compound cell that has 'personages' separated by '_x000B_'
             personages = row[MF_CHARACTERS].split('_x000B_')
             # sometimes starts with '(Geen afzonderlijke lijst van personages)' which we then remove
-            if personages[0] == '(Geen afzonderlijke lijst van personages)':  # can only remove() if it actually exists
+            if personages[0] == '(Geen afzonderlijke lijst van personages)':
                 personages.pop(0)
             man['_personages'] = fix_duplicates(row[MF_ORIGIN], personages)
         if row[MF_REMARKS]:
