@@ -17,6 +17,25 @@ create type form_type as enum (
     'Synopsis'
 );
 
+drop type if exists genre cascade;
+create type genre as enum (
+    'Comedy',
+    'Comical tragedy',
+    'Interlude',
+    'Opera',
+    'Pastoral play',
+    'Tragedy',
+    'Tragicomedy'
+);
+
+drop type if exists subgenre cascade;
+create type subgenre as enum (
+    'Comedy in Greek fashion',
+    'Farce',
+    'Martyr tragedy',
+    'Sacred comedy'
+);
+
 drop table if exists manifestations cascade;
 create table manifestations (
     id uuid primary key,
@@ -26,8 +45,8 @@ create table manifestations (
     form form,
     form_type form_type not null,
     is_anonymous boolean not null,
-    genre text,
-    subgenre text,
+    genre genre,
+    subgenre subgenre,
     has_dramaweb_scan boolean,                  -- internal: somewhere in project there is a scan (column Y)
     has_dramaweb_transcription boolean,         -- internal: transcription was made in this project (column Y)
     ceneton_scan text,                          -- optional url, taken from column 'BD'
