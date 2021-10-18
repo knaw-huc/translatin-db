@@ -1,3 +1,5 @@
+translatin=# with place_counts as (select distinct(place_id),count(*) from manifestations_publishers group by place_id order by count desc) select p.name,place_counts.count from places p,place_counts where place_counts.place_id = p.id;
+
 translatin=# select sub.ceneton_count,count(*) from (select distinct(manifestation_id),count(*) as ceneton_count from manifestation_ceneton group by manifestation_id) sub group by sub.ceneton_count;
  ceneton_count | count
 ---------------+-------
