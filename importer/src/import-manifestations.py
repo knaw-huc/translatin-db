@@ -16,7 +16,7 @@ from mapping.manifestations import MF_ORIGIN, MF_CENETON_FROM, MF_CENETON_UPTO, 
     MF_AUTHOR_FROM, MF_AUTHOR_UPTO, MF_FINGERPRINT, MF_TITLE_FROM, MF_LANG_FROM, MF_CERT_FROM, MF_TITLE_UPTO, \
     MF_FORM, MF_FORM_TYPE, MF_PUBLISHER_FROM, MF_PUBLISHER_UPTO, MF_GENRE, MF_SUBGENRE, MF_CHARACTERS, MF_REMARKS, \
     MF_LITERATURE, MF_HAS_DRAMAWEB_TRANSCRIPTION, MF_EXTERNAL_SCAN_URL, MF_CENETON_SCAN_URL, \
-    MF_CENETON_TRANSCRIPTION_URL
+    MF_CENETON_TRANSCRIPTION_URL, MF_PUBLISH_PLACE_FROM, MF_PUBLISH_PLACE_UPTO
 
 parser = configparser.ConfigParser(interpolation=configparser.ExtendedInterpolation())
 parser.read('config.ini')
@@ -26,8 +26,17 @@ ic(wb.sheetnames)
 sheet = wb[conf['name']]
 
 
-# pers = ic(sheet['CH39'].value)
-# ic(pers.split('_x000B_'))  # vertical tab \u000B encoded
+def collect_places(cursor):
+    places = set()  # remove possible duplicates by collecting into a set
+
+    for row in sheet.iter_rows(min_row=2, values_only=True):  # skip title row
+        for i in range(MF_PUBLISH_PLACE_FROM, MF_PUBLISH_PLACE_UPTO):
+            if row[i]:
+                places.add(row[i])
+
+    stmt = "INSERT INTO places (name) VALUES %s ON CONFLICT (name) DO NOTHING"
+    data = [(place,) for place in places]  # convert set to list of tuples
+    execute_values(cursor, stmt, data)
 
 
 def create_manifestations(cursor):
@@ -115,7 +124,8 @@ def create_manifestations(cursor):
 
         # 1:n relationship with publishers/printers.
         # These are also linked by name in Excel, so publishers MUST be imported first.
-        publishers = [row[i] for i in range(MF_PUBLISHER_FROM, MF_PUBLISHER_UPTO) if row[i]]
+        place_offset = MF_PUBLISH_PLACE_FROM - MF_PUBLISHER_FROM
+        publishers = [(row[i], row[i + place_offset]) for i in range(MF_PUBLISHER_FROM, MF_PUBLISHER_UPTO) if row[i]]
         man['_publishers'] = fix_publishers(cursor, row[MF_ORIGIN], publishers)
 
         create_manifestation(cursor, man)
@@ -125,7 +135,11 @@ def fix_publishers(cursor, origin, publishers):
     unique_names = set()
     fixed_publishers = list()
 
-    for publisher_name in publishers:
+    for (publisher_name, place_name) in publishers:
+        if not place_name:
+            ic('MISSING PUBLICATION PLACE', origin, publisher_name)
+            continue
+
         if publisher_name in unique_names:
             ic('DUPLICATE PUBLISHER', origin, publisher_name)
             continue
@@ -137,7 +151,7 @@ def fix_publishers(cursor, origin, publishers):
             ic('UNKNOWN PUBLISHER NAME', origin, publisher_name)
             continue
 
-        fixed_publishers.append(publisher_name)
+        fixed_publishers.append((publisher_name, place_name))
 
     return fixed_publishers
 
@@ -203,14 +217,15 @@ def create_manifestation(cursor, man):
             cursor.execute(stmt, data)
 
     if '_publishers' in man:
-        for publisher_name in man['_publishers']:
-            ic(publisher_name)
+        for (publisher_name, place_name) in man['_publishers']:
+            ic(publisher_name, place_name)
             stmt = '''
-            INSERT INTO manifestations_publishers (manifestation_id, publisher_id) VALUES (
+            INSERT INTO manifestations_publishers (manifestation_id, publisher_id, place_id) VALUES (
                 %s,
-                (SELECT id FROM publishers WHERE name = %s))
+                (SELECT id FROM publishers WHERE name = %s),
+                (SELECT id FROM places WHERE name = %s))
             '''
-            data = (man['id'], publisher_name)
+            data = (man['id'], publisher_name, place_name)
             cursor.execute(stmt, data)
 
 
@@ -223,6 +238,7 @@ try:
         curs.execute("select version()")
         version = curs.fetchone()
         ic(version)
+        collect_places(curs)
         create_manifestations(curs)
         conn.commit()
 except (Exception, psycopg2.DatabaseError) as error:

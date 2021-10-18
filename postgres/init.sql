@@ -213,8 +213,10 @@ drop table if exists manifestations_publishers cascade;
 create table manifestations_publishers (
     manifestation_id uuid not null,
     publisher_id uuid not null,
+    place_id smallint,
     primary key (manifestation_id, publisher_id),
     foreign key (manifestation_id) references manifestations (id),
-    foreign key (publisher_id) references publishers (id)
+    foreign key (publisher_id) references publishers (id),
+    foreign key (place_id) references places (id)
 );
 create unique index on manifestations_publishers (publisher_id, manifestation_id);
