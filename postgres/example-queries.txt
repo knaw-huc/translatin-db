@@ -1,4 +1,14 @@
 translatin=# with place_counts as (select distinct(place_id),count(*) from manifestations_publishers group by place_id order by count desc) select p.name,place_counts.count from places p,place_counts where place_counts.place_id = p.id;
+       name       | count
+------------------+-------
+ Gent             |   323
+ Antwerpen        |   269
+ Ieper            |   173
+ Mechelen         |   154
+ Kortrijk         |    61
+ Brugge           |    60
+ Amsterdam        |    55
+ ...
 
 translatin=# select sub.ceneton_count,count(*) from (select distinct(manifestation_id),count(*) as ceneton_count from manifestation_ceneton group by manifestation_id) sub group by sub.ceneton_count;
  ceneton_count | count
