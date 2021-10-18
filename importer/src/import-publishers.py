@@ -12,7 +12,7 @@ from util import fix_duplicates
 
 import uuid
 
-from mapping.printers import PP_STD_NAME, PP_WED_ERVEN, \
+from mapping.printers import PP_STD_NAME, PP_WIDOW_HEIRS, \
     PP_FIRST_NAME, PP_PATRONYM, PP_PREFIX, PP_SURNAME, PP_ADDITION, \
     PP_ALT_NAMES_FROM, PP_ALT_NAMES_UPTO
 
@@ -46,8 +46,8 @@ def create_publishers(cursor):
         }
 
         # Name related data
-        if row[PP_WED_ERVEN]:
-            publisher['wed_erven'] = row[PP_WED_ERVEN]
+        if row[PP_WIDOW_HEIRS]:
+            publisher['widow_heirs'] = row[PP_WIDOW_HEIRS]
         if row[PP_FIRST_NAME]:
             publisher['first_name'] = row[PP_FIRST_NAME]
         if row[PP_PATRONYM]:

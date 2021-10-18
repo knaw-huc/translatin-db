@@ -180,11 +180,18 @@ create table authors_manifestations (
 );
 create unique index on authors_manifestations (manifestation_id, author_id);
 
+drop type if exists widow_heirs cascade;
+create type widow_heirs as enum (
+    'Heirs',
+    'Widow',
+    'Widow and Heirs'
+);
+
 drop table if exists publishers cascade;
 create table publishers (
     id uuid primary key,
     name text not null,
-    wed_erven text,         -- create optional enum type ('Wed', 'Erven', 'Both')?
+    widow_heirs widow_heirs,
     first_name text,        -- empty for publishers
     patronym text,          -- e.g., 'jansz.'
     prefix text,            -- e.g., 'de', 'vander'
