@@ -138,7 +138,6 @@ def fix_publishers(cursor, origin, publishers):
     for (publisher_name, place_name) in publishers:
         if not place_name:
             ic('MISSING PUBLICATION PLACE', origin, publisher_name)
-            continue
 
         if publisher_name in unique_names:
             ic('DUPLICATE PUBLISHER', origin, publisher_name)
@@ -219,13 +218,21 @@ def create_manifestation(cursor, man):
     if '_publishers' in man:
         for (publisher_name, place_name) in man['_publishers']:
             ic(publisher_name, place_name)
-            stmt = '''
-            INSERT INTO manifestations_publishers (manifestation_id, publisher_id, place_id) VALUES (
-                %s,
-                (SELECT id FROM publishers WHERE name = %s),
-                (SELECT id FROM places WHERE name = %s))
-            '''
-            data = (man['id'], publisher_name, place_name)
+            if place_name:
+                stmt = '''
+                INSERT INTO manifestations_publishers (manifestation_id, publisher_id, place_id) VALUES (
+                    %s,
+                    (SELECT id FROM publishers WHERE name = %s),
+                    (SELECT id FROM places WHERE name = %s))
+                '''
+                data = (man['id'], publisher_name, place_name)
+            else:
+                stmt = '''
+                INSERT INTO manifestations_publishers (manifestation_id, publisher_id) VALUES (
+                    %s,
+                    (SELECT id FROM publishers WHERE name = %s))
+                '''
+                data = (man['id'], publisher_name)
             cursor.execute(stmt, data)
 
 
