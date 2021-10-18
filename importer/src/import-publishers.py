@@ -12,7 +12,7 @@ from util import fix_duplicates
 
 import uuid
 
-from mapping.printers import PP_STD_NAME, PP_WIDOW_HEIRS, \
+from mapping.publishers import PP_STD_NAME, PP_WIDOW_HEIRS, \
     PP_FIRST_NAME, PP_PATRONYM, PP_PREFIX, PP_SURNAME, PP_ADDITION, \
     PP_ALT_NAMES_FROM, PP_ALT_NAMES_UPTO
 
