@@ -88,16 +88,14 @@ def create_manifestations(cursor):
                 ic('VERTICAL SPACE (\\v, 0x0b) in:', val)
                 val = val.replace('_x000B_', '')
             man['ceneton_scan'] = f'https://www.let.leidenuniv.nl/Dutch/Ceneton/Facsimiles/{val}'
-            ic(man['ceneton_scan'])
         if row[MF_CENETON_TRANSCRIPTION_URL]:
-            val = ic(row[MF_CENETON_TRANSCRIPTION_URL])
+            val = row[MF_CENETON_TRANSCRIPTION_URL]
             if len(val) < 8:
                 ic(row[MF_ORIGIN], 'SUSPICIOUSLY SHORT CENETON TRANSCRIPTION REF', val)
             if '_x000B_' in val:
                 ic(row[MF_ORIGIN], 'VERTICAL SPACE (\\v, 0x0b) in:', val)
                 val = val.replace('_x000B_', '')
             man['ceneton_transcription'] = f'https://www.let.leidenuniv.nl/Dutch/Ceneton/{val}.html'
-            ic(man['ceneton_transcription'])
         if row[MF_EXTERNAL_SCAN_URL]:
             man['external_scan'] = row[MF_EXTERNAL_SCAN_URL]
 
@@ -201,12 +199,10 @@ def create_manifestation(cursor, man):
     if '_personages' in man:
         stmt = 'INSERT INTO manifestation_personages (manifestation_id, name) VALUES %s'
         data = [(man['id'], name) for name in man['_personages'] if name]
-        ic(data)
         execute_values(cursor, stmt, data)
 
     if '_authors' in man:
         for (author_name, author_type) in man['_authors']:
-            ic(author_name, author_type)
             stmt = '''
             INSERT INTO authors_manifestations (author_id, manifestation_id) VALUES (
                 (SELECT id FROM authors WHERE name = %s AND type = %s),
@@ -217,7 +213,6 @@ def create_manifestation(cursor, man):
 
     if '_publishers' in man:
         for (publisher_name, place_name) in man['_publishers']:
-            ic(publisher_name, place_name)
             if place_name:
                 stmt = '''
                 INSERT INTO manifestations_publishers (manifestation_id, publisher_id, place_id) VALUES (
