@@ -14,7 +14,7 @@ import uuid
 
 from mapping.publishers import PP_STD_NAME, PP_WIDOW_HEIRS, \
     PP_FIRST_NAME, PP_PATRONYM, PP_PREFIX, PP_SURNAME, PP_ADDITION, \
-    PP_ALT_NAMES_FROM, PP_ALT_NAMES_UPTO
+    PP_ALT_NAMES_FROM, PP_ALT_NAMES_UPTO, PP_CERL_LINK
 
 parser = configparser.ConfigParser(interpolation=configparser.ExtendedInterpolation())
 parser.read('config.ini')
@@ -56,6 +56,8 @@ def create_publishers(cursor):
             publisher['prefix'] = row[PP_PREFIX]
         if row[PP_ADDITION]:
             publisher['addition'] = row[PP_ADDITION]
+        if row[PP_CERL_LINK]:
+            publisher['cerl_link'] = row[PP_CERL_LINK]
 
         # 1:n relationship with alternative literal names
         names = [row[i] for i in range(PP_ALT_NAMES_FROM, PP_ALT_NAMES_UPTO) if row[i]]

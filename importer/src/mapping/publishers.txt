@@ -10,3 +10,4 @@ col[8]=Alternative_Name2
 col[9]=Alternative_Name3
 col[10]=Alternative_Name4
 col[11]=Alternative_Name5
+col[12]=CERL-link

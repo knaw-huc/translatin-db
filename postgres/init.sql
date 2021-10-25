@@ -197,7 +197,8 @@ create table publishers (
     patronym text,          -- e.g., 'jansz.'
     prefix text,            -- e.g., 'de', 'vander'
     addition text,          -- e.g., (i) (ii)
-    surname text not null   -- equal to 'name' for publishers (e.g., Elzevier)
+    surname text not null,  -- equal to 'name' for publishers (e.g., Elzevier)
+    cerl_link text          -- CERL Thesaurus URL
 );
 create unique index on publishers (name);
 
