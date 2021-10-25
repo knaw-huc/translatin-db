@@ -184,7 +184,8 @@ drop type if exists widow_heirs cascade;
 create type widow_heirs as enum (
     'Heirs',
     'Widow',
-    'Widow and Heirs'
+    'Widow and Heirs',
+    'Widow and son'
 );
 
 drop table if exists publishers cascade;
