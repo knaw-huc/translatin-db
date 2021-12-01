@@ -16,7 +16,8 @@ from mapping.manifestations import MF_ORIGIN, MF_CENETON_FROM, MF_CENETON_UPTO, 
     MF_AUTHOR_FROM, MF_AUTHOR_UPTO, MF_FINGERPRINT, MF_TITLE_FROM, MF_LANG_FROM, MF_CERT_FROM, MF_TITLE_UPTO, \
     MF_FORM, MF_FORM_TYPE, MF_PUBLISHER_FROM, MF_PUBLISHER_UPTO, MF_GENRE, MF_SUBGENRE, MF_CHARACTERS, MF_REMARKS, \
     MF_LITERATURE, MF_HAS_DRAMAWEB_TRANSCRIPTION, MF_EXTERNAL_SCAN_URL, MF_CENETON_SCAN_URL, \
-    MF_CENETON_TRANSCRIPTION_URL, MF_PUBLISH_PLACE_FROM, MF_PUBLISH_PLACE_UPTO
+    MF_CENETON_TRANSCRIPTION_URL, MF_PUBLISH_PLACE_FROM, MF_PUBLISH_PLACE_UPTO, \
+    MF_LINK_UB_ANTWERP, MF_LINK_KBB, MF_LINK_UB_GENT, MF_LINK_BNF, MF_LINK_KB, MF_LINK_GOOGLE, MF_LINK_BLL
 
 parser = configparser.ConfigParser(interpolation=configparser.ExtendedInterpolation())
 parser.read('config.ini')
@@ -98,6 +99,20 @@ def create_manifestations(cursor):
             man['ceneton_transcription'] = f'https://www.let.leidenuniv.nl/Dutch/Ceneton/{val}.html'
         if row[MF_EXTERNAL_SCAN_URL]:
             man['external_scan'] = row[MF_EXTERNAL_SCAN_URL]
+        if row[MF_LINK_UB_ANTWERP]:
+            man['link_ub_antwerp'] = row[MF_LINK_UB_ANTWERP]
+        if row[MF_LINK_KBB]:
+            man['link_kbb'] = row[MF_LINK_KBB]
+        if row[MF_LINK_UB_GENT]:
+            man['link_ub_gent'] = row[MF_LINK_UB_GENT]
+        if row[MF_LINK_BNF]:
+            man['link_bnf'] = row[MF_LINK_BNF]
+        if row[MF_LINK_KB]:
+            man['link_kb'] = row[MF_LINK_KB]
+        if row[MF_LINK_GOOGLE]:
+            man['link_google'] = row[MF_LINK_GOOGLE]
+        if row[MF_LINK_BLL]:
+            man['link_bll'] = row[MF_LINK_BLL]
 
         # not in excel sheet, assume false. Can manually be set to True. Perhaps make this 'text' to hold URLs?
         man['external_transcription'] = False

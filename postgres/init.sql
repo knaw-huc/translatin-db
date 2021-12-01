@@ -55,7 +55,14 @@ create table manifestations (
     external_transcription boolean not null,    -- not in excel, always false to start, can manually set to true
     fingerprint text,
     literature text,
-    remarks text
+    remarks text,
+    link_ub_antwerp text,
+    link_kbb text,
+    link_ub_gent text,
+    link_bnf text,
+    link_kb text,
+    link_google text,
+    link_bll text
 );
 create unique index on manifestations(origin);
 
