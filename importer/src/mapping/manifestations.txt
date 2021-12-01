@@ -122,4 +122,5 @@ col[120]=Link_UB_Gent
 col[121]=Link_BNF
 col[122]=Link_KB
 col[123]=Link_Google
-col[124]=Toegvoegd aan database
+col[124]=Link_BLL
+col[125]=Toegevoegd aan database
