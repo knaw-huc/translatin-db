@@ -80,6 +80,7 @@ def create_publisher(cursor, publisher):
     data = [(publisher['id'], name) for name in publisher['_names']]
     execute_values(cursor, stmt, data)
 
+
 try:
     print("Connecting to translatin database...")
     psycopg2.extras.register_uuid()
