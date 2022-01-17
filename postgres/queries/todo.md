@@ -27,3 +27,20 @@ WHERE MT1.MANIFESTATION_ID <> MT2.MANIFESTATION_ID
 	AND LEVENSHTEIN(MT1.TITLE,MT2.TITLE) <= ROUND(GREATEST(LENGTH(MT1.TITLE),LENGTH(MT2.TITLE)) * 0.1)
 	AND MAN1.ID = MT1.MANIFESTATION_ID
 	AND MAN2.ID = MT2.MANIFESTATION_ID
+```
+
+We zien dat er enkele titels eindigen op een spatie, bijv. `M917` "Menecrates" (Latin) versus `M832` "Menecrates " (French).
+
+Laten we dat eerst uitzoeken en verbeteren.
+
+### Welke titel (in welke taal) heeft een ' ' (spatie) aan het einde:
+```sql
+SELECT MAN.ORIGIN,
+	MT.LANGUAGE,
+	'"' || MT.TITLE || '"' TITLE_ENDING_IN_SPACE
+FROM MANIFESTATIONS MAN,
+	MANIFESTATION_TITLES MT
+WHERE MAN.ID = MT.MANIFESTATION_ID
+	AND RIGHT(MT.TITLE,1) = ' '
+ORDER BY (SUBSTRING(MAN.ORIGIN, 2, LENGTH(MAN.ORIGIN)-1))::int
+```
