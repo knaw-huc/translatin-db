@@ -122,7 +122,7 @@ def create_manifestations(cursor):
         man['_ceneton'] = fix_duplicates(row[MF_ORIGIN], ceneton_ids)
 
         # 1:n relationship with titles which are {certain,uncertain} to be of a specific language
-        titles = [(row[MF_TITLE_FROM + i], row[MF_LANG_FROM + (2 * i)], row[MF_CERT_FROM + (2 * i)])
+        titles = [(row[MF_TITLE_FROM + i].rstrip(), row[MF_LANG_FROM + (2 * i)], row[MF_CERT_FROM + (2 * i)])
                   for i in range(0, MF_TITLE_UPTO - MF_TITLE_FROM) if row[MF_TITLE_FROM + i]]
         man['_titles'] = titles
 
