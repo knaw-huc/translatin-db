@@ -6,6 +6,78 @@ kunnen schrijven die nagaat welke records:
 
 Deze query zou moeten bepalen of er nog dubbele registraties in het Manifestations-bestand staan.
 
+## Versie met constraint op 'Form' en gelijke titeltalen (mits 'certain')
+```sql
+SELECT AUTHOR.NAME AUTHOR,
+    M1.ORIGIN ORIGIN1,
+    M1.FORM FORM1,
+    M1.EARLIEST EARLIEST1,
+    M1.LATEST LATEST1,
+    MT1.TITLE TITLE1,
+    MT1.LANGUAGE LANG1,
+    MT1.CERTAINTY CERTAIN1,
+    M2.ORIGIN ORIGIN2,
+    M2.FORM FORM2,
+    M2.EARLIEST EARLIEST2,
+    M2.LATEST LATEST2,
+    MT2.TITLE TITLE2,
+    MT2.LANGUAGE LANG2,
+    MT2.CERTAINTY CERTAIN2,
+    LEVENSHTEIN(MT1.TITLE, MT2.TITLE) LEVENSHTEIN
+FROM AUTHORS_MANIFESTATIONS AM1,
+    AUTHORS_MANIFESTATIONS AM2,
+    AUTHORS AUTHOR,
+    MANIFESTATIONS M1,
+    MANIFESTATIONS M2,
+    MANIFESTATION_TITLES MT1,
+    MANIFESTATION_TITLES MT2
+WHERE
+    -- Various table joins
+    AUTHOR.ID = AM1.AUTHOR_ID
+    AND M1.ID = AM1.MANIFESTATION_ID
+    AND M1.ID = MT1.MANIFESTATION_ID
+    AND M2.ID = AM2.MANIFESTATION_ID
+    AND M2.ID = MT2.MANIFESTATION_ID
+
+    -- Find the same authors for different manifestations
+    AND AM1.AUTHOR_ID = AM2.AUTHOR_ID
+    AND AM1.MANIFESTATION_ID <> AM2.MANIFESTATION_ID
+
+    -- Compare manifestation dates for overlap / equality / inclusion.
+    -- Implemented as follows:
+    --   * either the average of m1's earliest/latest lies between m2's earliest and latest;
+    --   * or the other way around: avg of m2's earliest/latest lies between m1's earliest and latest.
+    -- Uses TO_TIMESTAMP, and EXTRACT EPOCH to convert between date and epoch value for averaging.
+    AND (
+        TO_TIMESTAMP((EXTRACT(EPOCH FROM M1.EARLIEST) + EXTRACT(EPOCH FROM M1.LATEST)) / 2)::date BETWEEN M2.EARLIEST AND M2.LATEST
+     OR TO_TIMESTAMP((EXTRACT(EPOCH FROM M2.EARLIEST) + EXTRACT(EPOCH FROM M2.LATEST)) / 2)::date BETWEEN M1.EARLIEST AND M1.LATEST
+    )
+
+    -- Edition (Form) must be equal
+    AND M1.FORM = M2.FORM
+
+    -- Titles must be in a different language, iff languages are certain
+    AND (
+        MT1.CERTAINTY = 'Uncertain'
+        OR MT2.CERTAINTY = 'Uncertain'
+        OR MT1.LANGUAGE <> MT2.LANGUAGE
+    )
+
+    -- Compare levenshtein distance between titles.
+    AND LENGTH(MT1.TITLE) <= 255  -- levenshtein() only works on string length <= 255
+    AND LENGTH(MT2.TITLE) <= 255
+    AND LEVENSHTEIN(MT1.TITLE, MT2.TITLE) <= ROUND(GREATEST(LENGTH(MT1.TITLE), LENGTH(MT2.TITLE)) * 0.1)
+
+    -- No need to see each symmetrical pair (origin1,origin2) again as (origin2,origin1)
+    -- e.g. from (M24,M31) and (M31,M24) only keep (M24,M31) based on 24 < 31
+    AND (SUBSTRING(M1.ORIGIN, 2, LENGTH(M1.ORIGIN)-1))::int < (SUBSTRING(M2.ORIGIN, 2, LENGTH(M2.ORIGIN)-1))::int
+
+ORDER BY AUTHOR,
+    -- order by origin, e.g. (string) "M2008": seen as (int) 2008 => so "M2008", "M700", "M37" is ordered: M37, M700, M2008
+    (SUBSTRING(M1.ORIGIN, 2, LENGTH(M1.ORIGIN)-1))::int,  -- first origin1
+    (SUBSTRING(M2.ORIGIN, 2, LENGTH(M2.ORIGIN)-1))::int   -- then origin2
+```
+
 ## Uiteindelijke query
 ```sql
 SELECT AU.NAME AUTHOR,
