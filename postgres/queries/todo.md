@@ -6,9 +6,14 @@ kunnen schrijven die nagaat welke records:
 
 Deze query zou moeten bepalen of er nog dubbele registraties in het Manifestations-bestand staan.
 
-## Versie met constraint op 'Form' en gelijke titeltalen (mits 'certain')
+## Versie met constraint op gelijke titeltalen (mits 'certain')
+
+vergelijking op `Form` staat uit tot we definieren welke Forms we als gelijk
+willen beschouwen.
+
 ```sql
 SELECT AUTHOR.NAME AUTHOR,
+
     M1.ORIGIN ORIGIN1,
     M1.FORM FORM1,
     M1.EARLIEST EARLIEST1,
@@ -16,6 +21,7 @@ SELECT AUTHOR.NAME AUTHOR,
     MT1.TITLE TITLE1,
     MT1.LANGUAGE LANG1,
     MT1.CERTAINTY CERTAIN1,
+
     M2.ORIGIN ORIGIN2,
     M2.FORM FORM2,
     M2.EARLIEST EARLIEST2,
@@ -23,6 +29,7 @@ SELECT AUTHOR.NAME AUTHOR,
     MT2.TITLE TITLE2,
     MT2.LANGUAGE LANG2,
     MT2.CERTAINTY CERTAIN2,
+
     LEVENSHTEIN(MT1.TITLE, MT2.TITLE) LEVENSHTEIN
 FROM AUTHORS_MANIFESTATIONS AM1,
     AUTHORS_MANIFESTATIONS AM2,
@@ -53,14 +60,16 @@ WHERE
      OR TO_TIMESTAMP((EXTRACT(EPOCH FROM M2.EARLIEST) + EXTRACT(EPOCH FROM M2.LATEST)) / 2)::date BETWEEN M1.EARLIEST AND M1.LATEST
     )
 
-    -- Edition (Form) must be equal
-    AND M1.FORM = M2.FORM
+    -- Edition (Form) must be equal, but:
+    -- what to do with "Synopsis" vs "Synopsis (printed)" vs "Synopsis (manuscript) vs Manuscript"
+    -- which 'Form' is equal to which other 'Form'
+--     AND M1.FORM = M2.FORM
 
-    -- Titles must be in a different language, iff languages are certain
+    -- Titles must be in the same language, or uncertain (either one 'uncertain' is enough)
     AND (
-        MT1.CERTAINTY = 'Uncertain'
+        MT1.LANGUAGE = MT2.LANGUAGE
+        OR MT1.CERTAINTY = 'Uncertain'
         OR MT2.CERTAINTY = 'Uncertain'
-        OR MT1.LANGUAGE <> MT2.LANGUAGE
     )
 
     -- Compare levenshtein distance between titles.
