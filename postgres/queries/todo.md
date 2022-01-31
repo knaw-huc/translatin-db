@@ -12,8 +12,11 @@ vergelijking op `Form` staat uit tot we definieren welke Forms we als gelijk
 willen beschouwen.
 
 ```sql
-SELECT AUTHOR.NAME AUTHOR,
+SELECT
+    -- author name who worked on both candidates
+    AUTHOR.NAME AUTHOR,
 
+    -- stuff related to first candidate
     M1.ORIGIN ORIGIN1,
     M1.FORM FORM1,
     M1.EARLIEST EARLIEST1,
@@ -21,7 +24,9 @@ SELECT AUTHOR.NAME AUTHOR,
     MT1.TITLE TITLE1,
     MT1.LANGUAGE LANG1,
     MT1.CERTAINTY CERTAIN1,
+    PUB1.NAME PUB1,
 
+    -- stuff related to second candidate
     M2.ORIGIN ORIGIN2,
     M2.FORM FORM2,
     M2.EARLIEST EARLIEST2,
@@ -29,26 +34,36 @@ SELECT AUTHOR.NAME AUTHOR,
     MT2.TITLE TITLE2,
     MT2.LANGUAGE LANG2,
     MT2.CERTAINTY CERTAIN2,
+    PUB2.NAME PUB2,
 
+    -- distance between the two titles
     LEVENSHTEIN(MT1.TITLE, MT2.TITLE) LEVENSHTEIN
-FROM AUTHORS_MANIFESTATIONS AM1,
-    AUTHORS_MANIFESTATIONS AM2,
-    AUTHORS AUTHOR,
-    MANIFESTATIONS M1,
-    MANIFESTATIONS M2,
-    MANIFESTATION_TITLES MT1,
-    MANIFESTATION_TITLES MT2
-WHERE
-    -- Various table joins
-    AUTHOR.ID = AM1.AUTHOR_ID
-    AND M1.ID = AM1.MANIFESTATION_ID
-    AND M1.ID = MT1.MANIFESTATION_ID
-    AND M2.ID = AM2.MANIFESTATION_ID
-    AND M2.ID = MT2.MANIFESTATION_ID
 
+FROM
+    AUTHORS_MANIFESTATIONS AM1
+    JOIN AUTHORS AUTHOR ON (AUTHOR.ID = AM1.AUTHOR_ID)
+    JOIN MANIFESTATIONS M1 ON (M1.ID = AM1.MANIFESTATION_ID)
+    JOIN MANIFESTATION_TITLES MT1 ON (M1.ID = MT1.MANIFESTATION_ID)
+     LEFT JOIN MANIFESTATIONS_PUBLISHERS MP1 ON (M1.ID = MP1.MANIFESTATION_ID)
+    LEFT JOIN PUBLISHERS PUB1 ON (PUB1.ID = MP1.PUBLISHER_ID),
+
+    AUTHORS_MANIFESTATIONS AM2
+    JOIN MANIFESTATIONS M2 ON (M2.ID = AM2.MANIFESTATION_ID)
+    JOIN MANIFESTATION_TITLES MT2 ON (M2.ID = MT2.MANIFESTATION_ID)
+     LEFT JOIN MANIFESTATIONS_PUBLISHERS MP2 ON (M2.ID = MP2.MANIFESTATION_ID)
+    LEFT JOIN PUBLISHERS PUB2 ON (PUB2.ID = MP2.PUBLISHER_ID)
+
+WHERE
     -- Find the same authors for different manifestations
-    AND AM1.AUTHOR_ID = AM2.AUTHOR_ID
+    AM1.AUTHOR_ID = AM2.AUTHOR_ID
     AND AM1.MANIFESTATION_ID <> AM2.MANIFESTATION_ID
+
+    -- If publisher(s) are known, they must be equal, c.q. there must be overlap
+    AND (
+        MP1.PUBLISHER_ID = MP2.PUBLISHER_ID
+        OR MP1.PUBLISHER_ID IS NULL
+        OR MP2.PUBLISHER_ID IS NULL
+    )
 
     -- Compare manifestation dates for overlap / equality / inclusion.
     -- Implemented as follows:
@@ -86,7 +101,9 @@ WHERE
     -- e.g. from (M24,M31) and (M31,M24) only keep (M24,M31) based on 24 < 31
     AND (SUBSTRING(M1.ORIGIN, 2, LENGTH(M1.ORIGIN)-1))::int < (SUBSTRING(M2.ORIGIN, 2, LENGTH(M2.ORIGIN)-1))::int
 
-ORDER BY AUTHOR,
+ORDER BY
+    -- Order first by Author, then by some sensible "lower number entries go first" based off of candidate's "Origin"
+    AUTHOR,
     -- order by origin, e.g. (string) "M2008": seen as (int) 2008 => so "M2008", "M700", "M37" is ordered: M37, M700, M2008
     (SUBSTRING(M1.ORIGIN, 2, LENGTH(M1.ORIGIN)-1))::int,  -- first origin1
     (SUBSTRING(M2.ORIGIN, 2, LENGTH(M2.ORIGIN)-1))::int   -- then origin2
