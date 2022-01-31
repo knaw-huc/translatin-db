@@ -60,10 +60,15 @@ WHERE
      OR TO_TIMESTAMP((EXTRACT(EPOCH FROM M2.EARLIEST) + EXTRACT(EPOCH FROM M2.LATEST)) / 2)::date BETWEEN M1.EARLIEST AND M1.LATEST
     )
 
-    -- Edition (Form) must be equal, but:
-    -- what to do with "Synopsis" vs "Synopsis (printed)" vs "Synopsis (manuscript) vs Manuscript"
-    -- which 'Form' is equal to which other 'Form'
---     AND M1.FORM = M2.FORM
+    -- Edition (Form) must be equal.
+    -- Sometimes it is unknown whether a Synopsis was a manuscript or printed, in
+    -- which case the form was set to 'Synopsis'. Therefore Synopsis should be
+    -- treated equal to both 'Synopsis (manuscript)' and 'Synopsis (printed)'
+    AND (
+        M1.FORM = M2.FORM
+        OR (M1.FORM = 'Synopsis' AND M2.FORM in ('Synopsis (manuscript)', 'Synopsis (printed)'))
+        OR (M2.FORM = 'Synopsis' AND M1.FORM in ('Synopsis (manuscript)', 'Synopsis (printed)'))
+    )
 
     -- Titles must be in the same language, or uncertain (either one 'uncertain' is enough)
     AND (
