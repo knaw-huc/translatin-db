@@ -6,8 +6,6 @@ kunnen schrijven die nagaat welke records:
 
 Deze query zou moeten bepalen of er nog dubbele registraties in het Manifestations-bestand staan.
 
-## Versie met constraint op gelijke titeltalen (mits 'certain'), Form, Publisher
-
 ```sql
 SELECT
     -- author name who worked on both candidates
