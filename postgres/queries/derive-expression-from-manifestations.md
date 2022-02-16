@@ -44,7 +44,6 @@ aangepast.
 - Op termijn (na samenvoeging van data Proot): de personages moeten
 overeenkomen.
 
-\pagebreak
 ## Work in progress
 
 ```sql
