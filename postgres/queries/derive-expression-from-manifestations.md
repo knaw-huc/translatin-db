@@ -26,7 +26,7 @@ Expression, zou ik deze graag nog eens willen bekijken.
 Manifestations zelf met een Levensthein afstand van 0.1 of 0.2 (ligt een beetje
 aan de zoekopbrengst).
 
-- ‘Form_type’ moet overeenkomen (even opletten bij manuscript, dat valt nu
+- ‘Form’ moet overeenkomen (even opletten bij manuscript, dat valt nu
 onder full edition en dat is mogelijk onwenselijk). Is iets dat ik sowieso nog
 even zou willen langslopen voor we definitief Manifestations samenvoegen tot
 dezelfde Expression.
