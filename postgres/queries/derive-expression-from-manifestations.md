@@ -132,16 +132,15 @@ WHERE
         OR m2.subgenre IS NULL
     )
 
-    -- Candidate manifestations must be <= 25 years from each other
+    -- Candidate manifestations must be <= 25 years from each other.
     -- implementation:
     --   1) get average of (earliest,latest) year for both candidates;
-    --   2) take absolute value of their difference;
-    --      (subtraction for distance, absolute value for symmetry)
-    --   3) check if <= 25 years.
+    --   2) subtract to get the 'distance' between candidates;
+    --   3) check if <= 25 years (depending on which candidate was earliest).
     AND (
-        ABS(((EXTRACT(YEAR FROM M1.EARLIEST) + EXTRACT(YEAR FROM M1.LATEST)) / 2) -
-            ((EXTRACT(YEAR FROM M2.EARLIEST) + EXTRACT(YEAR FROM M2.LATEST)) / 2))
-        <= 25
+        (EXTRACT(YEAR FROM M1.EARLIEST) + EXTRACT(YEAR FROM M1.LATEST)) / 2 -
+        (EXTRACT(YEAR FROM M2.EARLIEST) + EXTRACT(YEAR FROM M2.LATEST)) / 2
+        BETWEEN -25 AND 25
     )
 
     -- No need to see each symmetrical pair (origin1,origin2) again as (origin2,origin1)
