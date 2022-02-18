@@ -115,8 +115,22 @@ WHERE
     AND LENGTH(MT2.TITLE) <= 255
     AND LEVENSHTEIN(MT1.TITLE, MT2.TITLE) <= ROUND(GREATEST(LENGTH(MT1.TITLE), LENGTH(MT2.TITLE)) * 0.2)
 
-	-- Form_type must match
-	AND m1.form_type = m2.form_type
+    -- Form_type must match
+    AND m1.form_type = m2.form_type
+
+    -- Genre must match, if it exists
+    AND (
+        m1.genre = m2.genre
+        OR m1.genre IS NULL
+        OR m2.genre IS NULL
+    )
+
+    -- Subgenre must match, if it exists
+    AND (
+        m1.subgenre = m2.subgenre
+        OR m1.subgenre IS NULL
+        OR m2.subgenre IS NULL
+    )
 
     -- No need to see each symmetrical pair (origin1,origin2) again as (origin2,origin1)
     -- e.g. from (M24,M31) and (M31,M24) only keep (M24,M31) based on 24 < 31
