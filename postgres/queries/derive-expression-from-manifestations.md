@@ -132,7 +132,8 @@ WHERE
         OR m2.subgenre IS NULL
     )
 
-    -- Candidate manifestations must be <= 25 years from each other -- implementation:
+    -- Candidate manifestations must be <= 25 years from each other
+    -- implementation:
     --   1) get average of (earliest,latest) year for both candidates;
     --   2) take absolute value of their difference;
     --      (subtraction for distance, absolute value for symmetry)
