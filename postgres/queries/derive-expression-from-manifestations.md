@@ -49,6 +49,8 @@ SELECT
     -- stuff related to first candidate
     M1.ORIGIN ORIGIN1,
     M1.FORM FORM1,
+    M1.GENRE GENRE1,
+    M1.SUBGENRE SUBGENRE1,
     M1.EARLIEST EARLIEST1,
     M1.LATEST LATEST1,
     MT1.TITLE TITLE1,
@@ -58,6 +60,8 @@ SELECT
     -- stuff related to second candidate
     M2.ORIGIN ORIGIN2,
     M2.FORM FORM2,
+    M2.GENRE GENRE2,
+    M2.SUBGENRE SUBGENRE2,
     M2.EARLIEST EARLIEST2,
     M2.LATEST LATEST2,
     MT2.TITLE TITLE2,
@@ -113,23 +117,30 @@ WHERE
     -- Compare levenshtein distance between titles.
     AND LENGTH(MT1.TITLE) <= 255  -- levenshtein() only works on string length <= 255
     AND LENGTH(MT2.TITLE) <= 255
-    AND LEVENSHTEIN(MT1.TITLE, MT2.TITLE) <= ROUND(GREATEST(LENGTH(MT1.TITLE), LENGTH(MT2.TITLE)) * 0.2)
+    AND LEVENSHTEIN(MT1.TITLE, MT2.TITLE) <=
+        ROUND(GREATEST(LENGTH(MT1.TITLE), LENGTH(MT2.TITLE)) * 0.2)
 
     -- Form_type must match
-    AND m1.form_type = m2.form_type
+    AND M1.FORM_TYPE = M2.FORM_TYPE
+
+    -- Form: "First printing" can never match another "First printing"
+    AND NOT (
+        M1.FORM = 'First Printing'
+        AND M2.FORM = 'First Printing'
+    )
 
     -- Genre must match, if it exists
     AND (
-        m1.genre = m2.genre
-        OR m1.genre IS NULL
-        OR m2.genre IS NULL
+        M1.GENRE = M2.GENRE
+        OR M1.GENRE IS NULL
+        OR M2.GENRE IS NULL
     )
 
     -- Subgenre must match, if it exists
     AND (
-        m1.subgenre = m2.subgenre
-        OR m1.subgenre IS NULL
-        OR m2.subgenre IS NULL
+        M1.SUBGENRE = M2.SUBGENRE
+        OR M1.SUBGENRE IS NULL
+        OR M2.SUBGENRE IS NULL
     )
 
     -- Candidate manifestations must be <= 25 years from each other.
@@ -143,9 +154,24 @@ WHERE
         BETWEEN -25 AND 25
     )
 
+    -- A 'Reprint' can never occur before a 'First Printing'
+    AND (  -- either M1 <= M2, or M1 ≠ 'First Printing', or M2 ≠ 'Reprint'
+        ((EXTRACT(YEAR FROM M1.EARLIEST) + EXTRACT(YEAR FROM M1.LATEST)) / 2 <=
+         (EXTRACT(YEAR FROM M2.EARLIEST) + EXTRACT(YEAR FROM M2.LATEST)) / 2)
+        OR M1.FORM <> 'First Printing'
+        OR M2.FORM <> 'Reprint'
+    )
+    AND (  -- similarly for M2 <= M1
+        ((EXTRACT(YEAR FROM M2.EARLIEST) + EXTRACT(YEAR FROM M2.LATEST)) / 2 <=
+         (EXTRACT(YEAR FROM M1.EARLIEST) + EXTRACT(YEAR FROM M1.LATEST)) / 2)
+        OR M2.FORM <> 'First Printing'
+        OR M1.FORM <> 'Reprint'
+    )
+
     -- No need to see each symmetrical pair (origin1,origin2) again as (origin2,origin1)
     -- e.g. from (M24,M31) and (M31,M24) only keep (M24,M31) based on 24 < 31
-    AND (SUBSTRING(M1.ORIGIN, 2, LENGTH(M1.ORIGIN)-1))::int < (SUBSTRING(M2.ORIGIN, 2, LENGTH(M2.ORIGIN)-1))::int
+    AND (SUBSTRING(M1.ORIGIN, 2, LENGTH(M1.ORIGIN)-1))::int <
+        (SUBSTRING(M2.ORIGIN, 2, LENGTH(M2.ORIGIN)-1))::int
 
 ORDER BY
     -- order by origin, e.g. (string) "M2008": seen as (int) 2008 => so "M2008", "M700", "M37" is ordered: M37, M700, M2008
