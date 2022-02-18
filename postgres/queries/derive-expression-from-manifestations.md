@@ -82,7 +82,7 @@ WHERE
     --   1) select all candidate1 authors;
     --   2) remove all candidate2 authors from this set;
     --   3) answer: candidates are a match if result is empty.
-     AND NOT EXISTS (
+    AND NOT EXISTS (
         SELECT AUTHOR_ID
             FROM AUTHORS_MANIFESTATIONS AM
             WHERE AM.MANIFESTATION_ID = AM1.MANIFESTATION_ID
@@ -111,9 +111,12 @@ WHERE
     )
 
     -- Compare levenshtein distance between titles.
-     AND LENGTH(MT1.TITLE) <= 255  -- levenshtein() only works on string length <= 255
-     AND LENGTH(MT2.TITLE) <= 255
-     AND LEVENSHTEIN(MT1.TITLE, MT2.TITLE) <= ROUND(GREATEST(LENGTH(MT1.TITLE), LENGTH(MT2.TITLE)) * 0.2)
+    AND LENGTH(MT1.TITLE) <= 255  -- levenshtein() only works on string length <= 255
+    AND LENGTH(MT2.TITLE) <= 255
+    AND LEVENSHTEIN(MT1.TITLE, MT2.TITLE) <= ROUND(GREATEST(LENGTH(MT1.TITLE), LENGTH(MT2.TITLE)) * 0.2)
+
+	-- Form_type must match
+	AND m1.form_type = m2.form_type
 
     -- No need to see each symmetrical pair (origin1,origin2) again as (origin2,origin1)
     -- e.g. from (M24,M31) and (M31,M24) only keep (M24,M31) based on 24 < 31
