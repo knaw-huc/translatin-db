@@ -180,4 +180,4 @@ ORDER BY
 ```
 
 ## Collated and transposed results
-See [this query](https://github.com/knaw-huc/translatin-wemi/blob/main/postgres/queries/derive-expressions-.md).
+See [this query](https://github.com/knaw-huc/translatin-wemi/blob/main/postgres/queries/derive-expressions-collate-pivot.md).
