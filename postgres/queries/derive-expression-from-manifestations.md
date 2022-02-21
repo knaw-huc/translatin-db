@@ -42,7 +42,7 @@ aangepast.
 - Op termijn (na samenvoeging van data Proot): de personages moeten
 overeenkomen.
 
-## Work in progress
+## Core query
 
 ```sql
 SELECT
@@ -178,3 +178,6 @@ ORDER BY
     (SUBSTRING(M1.ORIGIN, 2, LENGTH(M1.ORIGIN)-1))::int,  -- first origin1
     (SUBSTRING(M2.ORIGIN, 2, LENGTH(M2.ORIGIN)-1))::int   -- then origin2
 ```
+
+## Collated and transposed results
+See [this query](https://github.com/knaw-huc/translatin-wemi/blob/main/postgres/queries/derive-expressions-.md).
