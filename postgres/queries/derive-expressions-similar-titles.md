@@ -1,4 +1,5 @@
 ```sql
+WITH main AS(
 SELECT
     -- stuff related to first candidate
     M1.ORIGIN ORIGIN1,
@@ -115,6 +116,12 @@ WHERE
 
 ORDER BY
     -- order by origin, e.g. (string) "M2008": seen as (int) 2008 => so "M2008", "M700", "M37" is ordered: M37, M700, M2008
-    (SUBSTRING(M1.ORIGIN, 2, LENGTH(M1.ORIGIN)-1))::int,  -- first origin1
-    (SUBSTRING(M2.ORIGIN, 2, LENGTH(M2.ORIGIN)-1))::int   -- then origin2
+    SUBSTRING(M1.ORIGIN, 2, LENGTH(M1.ORIGIN)-1)::int,  -- first origin1
+    SUBSTRING(M2.ORIGIN, 2, LENGTH(M2.ORIGIN)-1)::int   -- then origin2
+)
+SELECT *
+FROM main m1
+WHERE
+    (SUBSTRING(ORIGIN1, 2, LENGTH(ORIGIN1)-1)::int < SUBSTRING(ORIGIN2, 2, LENGTH(ORIGIN2)-1)::int)
+    OR NOT EXISTS (SELECT FROM main m2 WHERE m2.origin2 = m1.origin1 AND m2.origin1 = m1.origin2)
 ```
