@@ -1,3 +1,4 @@
+```sql
 SELECT
     -- stuff related to first candidate
     M1.ORIGIN ORIGIN1,
@@ -116,3 +117,4 @@ ORDER BY
     -- order by origin, e.g. (string) "M2008": seen as (int) 2008 => so "M2008", "M700", "M37" is ordered: M37, M700, M2008
     (SUBSTRING(M1.ORIGIN, 2, LENGTH(M1.ORIGIN)-1))::int,  -- first origin1
     (SUBSTRING(M2.ORIGIN, 2, LENGTH(M2.ORIGIN)-1))::int   -- then origin2
+```
