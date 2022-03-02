@@ -68,9 +68,9 @@ WHERE
             )
     )
 
-    -- find shorter titles in long ones (substring), after normalisation
+    -- find equal titles, and substrings, after normalisation
     AND LENGTH(MT1.TITLE) > 3  -- ignore 'Asa' and 'Dos'
-    AND LENGTH(MT1.TITLE) < LENGTH(MT2.TITLE)
+    AND LENGTH(MT1.TITLE) <= LENGTH(MT2.TITLE)
     AND POSITION(
         TRANSLATE(LOWER(MT1.TITLE), 'jv', 'iu')
         in TRANSLATE(LOWER(MT2.TITLE), 'jv', 'iu')
