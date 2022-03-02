@@ -112,11 +112,6 @@ WHERE
         OR M1.FORM <> 'Reprint'
     )
 
-    -- No need to see each symmetrical pair (origin1,origin2) again as (origin2,origin1)
-    -- e.g. from (M24,M31) and (M31,M24) only keep (M24,M31) based on 24 < 31
---     AND (SUBSTRING(M1.ORIGIN, 2, LENGTH(M1.ORIGIN)-1))::int <
---         (SUBSTRING(M2.ORIGIN, 2, LENGTH(M2.ORIGIN)-1))::int
-
 ORDER BY
     -- order by origin, e.g. (string) "M2008": seen as (int) 2008 => so "M2008", "M700", "M37" is ordered: M37, M700, M2008
     (SUBSTRING(M1.ORIGIN, 2, LENGTH(M1.ORIGIN)-1))::int,  -- first origin1
