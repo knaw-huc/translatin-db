@@ -86,8 +86,8 @@ def create_publisher(cursor, publisher):
 
 def update_provenance(cursor):
     stmt = 'UPDATE _provenance SET size = %s, sha1sum = %s, imported_at = NOW() WHERE name = %s'
-    data = [(prov_size, prov_sha1, prov_name)]
-    execute_values(cursor, stmt, data)
+    data = (prov_size, prov_sha1, prov_name)
+    cursor.execute(stmt, data)
 
 
 try:
