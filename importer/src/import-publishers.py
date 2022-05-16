@@ -1,25 +1,28 @@
 #!/usr/bin/env python3
 
 import configparser
-from icecream import ic
-from openpyxl import load_workbook
+import os
+import uuid
 
 import psycopg2.extras
+from icecream import ic
+from openpyxl import load_workbook
 from psycopg2.extensions import AsIs
 from psycopg2.extras import execute_values
-
-from util import fix_duplicates
-
-import uuid
 
 from mapping.publishers import PP_STD_NAME, PP_WIDOW_HEIRS, \
     PP_FIRST_NAME, PP_PATRONYM, PP_PREFIX, PP_SURNAME, PP_ADDITION, \
     PP_ALT_NAMES_FROM, PP_ALT_NAMES_UPTO, PP_CERL_LINK
+from util import fix_duplicates, sha1sum
 
 parser = configparser.ConfigParser(interpolation=configparser.ExtendedInterpolation())
 parser.read('config.ini')
 conf = parser['publishers']
-wb = load_workbook(ic(conf['path']))
+path = ic(conf['path'])
+prov_name = ic(os.path.basename(path))
+prov_size = ic(os.path.getsize(path))
+prov_sha1 = ic(sha1sum(path))
+wb = load_workbook(path)
 ic(wb.sheetnames)
 sheet = wb[conf['name']]
 
@@ -81,6 +84,12 @@ def create_publisher(cursor, publisher):
     execute_values(cursor, stmt, data)
 
 
+def update_provenance(cursor):
+    stmt = 'UPDATE _provenance SET size = %s, sha1sum = %s, imported_at = NOW() WHERE name = %s'
+    data = [(prov_size, prov_sha1, prov_name)]
+    execute_values(cursor, stmt, data)
+
+
 try:
     print("Connecting to translatin database...")
     psycopg2.extras.register_uuid()
@@ -90,6 +99,8 @@ try:
         version = curs.fetchone()
         ic(version)
         create_publishers(curs)
+        conn.commit()
+        update_provenance(curs)
         conn.commit()
 except (Exception, psycopg2.DatabaseError) as error:
     print(error)

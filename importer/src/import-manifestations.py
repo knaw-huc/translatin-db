@@ -1,16 +1,14 @@
 #!/usr/bin/env python3
 
 import configparser
-from icecream import ic
-from openpyxl import load_workbook
+import os
+import uuid
 
 import psycopg2.extras
+from icecream import ic
+from openpyxl import load_workbook
 from psycopg2.extensions import AsIs
 from psycopg2.extras import execute_values
-
-from util import fix_duplicates
-
-import uuid
 
 from mapping.manifestations import MF_ORIGIN, MF_CENETON_FROM, MF_CENETON_UPTO, MF_EARLIEST, MF_LATEST, \
     MF_AUTHOR_FROM, MF_AUTHOR_UPTO, MF_FINGERPRINT, MF_TITLE_FROM, MF_LANG_FROM, MF_CERT_FROM, MF_TITLE_UPTO, \
@@ -18,11 +16,16 @@ from mapping.manifestations import MF_ORIGIN, MF_CENETON_FROM, MF_CENETON_UPTO, 
     MF_LITERATURE, MF_HAS_DRAMAWEB_TRANSCRIPTION, MF_EXTERNAL_SCAN_URL, MF_CENETON_SCAN_URL, \
     MF_CENETON_TRANSCRIPTION_URL, MF_PUBLISH_PLACE_FROM, MF_PUBLISH_PLACE_UPTO, \
     MF_LINK_UB_ANTWERP, MF_LINK_KBB, MF_LINK_UB_GENT, MF_LINK_BNF, MF_LINK_KB, MF_LINK_GOOGLE, MF_LINK_BLL
+from util import fix_duplicates, sha1sum
 
 parser = configparser.ConfigParser(interpolation=configparser.ExtendedInterpolation())
 parser.read('config.ini')
 conf = parser['manifestations']
-wb = load_workbook(ic(conf['path']))
+path = ic(conf['path'])
+prov_name = ic(os.path.basename(path))
+prov_size = ic(os.path.getsize(path))
+prov_sha1 = ic(sha1sum(path))
+wb = load_workbook(path)
 ic(wb.sheetnames)
 sheet = wb[conf['name']]
 
@@ -246,6 +249,12 @@ def create_manifestation(cursor, man):
             cursor.execute(stmt, data)
 
 
+def update_provenance(cursor):
+    stmt = 'UPDATE _provenance SET size = %s, sha1sum = %s, imported_at = NOW() WHERE name = %s'
+    data = [(prov_size, prov_sha1, prov_name)]
+    execute_values(cursor, stmt, data)
+
+
 conn = None
 try:
     print("Connecting to translatin database...")
@@ -257,6 +266,8 @@ try:
         ic(version)
         collect_places(curs)
         create_manifestations(curs)
+        conn.commit()
+        update_provenance(curs)
         conn.commit()
 except (Exception, psycopg2.DatabaseError) as error:
     print(error)
