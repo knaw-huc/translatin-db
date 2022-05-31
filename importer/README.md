@@ -26,9 +26,10 @@ dropping all tables and re-creating them !!
 
 ### (re-)import excel sheet data
 ```shell
-./import-authors.py
-./import-publishers.py
-./import-manifestations.py   # depends on and must run *after* importing {authors,publishers}
+./import-authors.py 2> /logs/authors.log
+./import-publishers.py 2> /logs/publishers.log
+# depends on and must run *after* importing authors and publishers:
+./import-manifestations.py 2> /logs/manifestations.log
 ```
 
 ### verify some data using psql (optional)
