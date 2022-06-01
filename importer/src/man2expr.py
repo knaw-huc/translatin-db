@@ -23,7 +23,7 @@ def find_similar_manifestations(cursor, find_similar_manifestations_query):
     rows = cursor.fetchall()
     print(f'Found {len(rows)} Expressions')
 
-    # keep a running serial number foo all Expressions: "E1", "E2", …
+    # keep a running serial number for all Expressions: "E1", "E2", …
     serialno = 1
 
     # go over all rows, each row is one of the equivalence classes:
