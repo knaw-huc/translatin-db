@@ -84,13 +84,6 @@ WHERE
     -- Form_type must match
     AND M1.FORM_TYPE = M2.FORM_TYPE
     
-    -- HDJ: do we still need the following?
-    -- Form: "First printing" can never match another "First printing"
-    --     AND NOT (
-    --         M1.FORM = 'First Printing'
-    --         AND M2.FORM = 'First Printing'
-    --     )
-
     -- Genre must match, if it exists
     AND (
         M1.GENRE = M2.GENRE
