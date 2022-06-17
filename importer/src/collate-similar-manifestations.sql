@@ -43,7 +43,7 @@ WHERE
     --   1) select all candidate1 authors;
     --   2) remove all candidate2 authors from this set;
     --   3) answer: candidates are a match if result is empty.
-     AND NOT EXISTS (
+    AND NOT EXISTS (
         SELECT AUTHOR_ID
             FROM AUTHORS_MANIFESTATIONS AM
             WHERE AM.MANIFESTATION_ID = AM1.MANIFESTATION_ID
@@ -69,7 +69,6 @@ WHERE
             EXCEPT SELECT LANGUAGE
                 FROM MANIFESTATION_TITLES MT
                 WHERE MT.MANIFESTATION_ID = AM2.MANIFESTATION_ID
-                AND MT.LANGUAGE = MT2.LANGUAGE
         )
     )
 
