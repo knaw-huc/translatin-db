@@ -95,6 +95,7 @@ def assign_leftover_manifestations(cursor, first_free_serial):
     serialno = first_free_serial
     for origin in rows:
         expression_label = f'E{serialno}'
+        print(f'{expression_label}: {origin}')
         serialno += 1
         expression_id = create_expression(cursor, expression_label)
         link_manifestation_to_expression(cursor, origin, expression_id)
