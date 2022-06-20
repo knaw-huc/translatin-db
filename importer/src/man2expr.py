@@ -54,6 +54,8 @@ def find_similar_manifestations(cursor, find_similar_manifestations_query):
         for origin in origins:
             link_manifestation_to_expression(cursor, origin, expression_id)
 
+    return serialno
+
 
 def create_expression(cursor, label):
     # label = e.g. "E12"
@@ -74,6 +76,30 @@ def link_manifestation_to_expression(cursor, manifestation_origin, expression_id
     cursor.execute(stmt, data)
 
 
+def assign_leftover_manifestations(cursor, first_free_serial):
+    find_leftover_manifestations_query='''
+    SELECT m.origin
+    FROM manifestations m
+    WHERE NOT EXISTS (
+        SELECT FROM expression_manifestations em WHERE em.manifestation_id = m.id
+    )
+    ORDER BY (SUBSTRING(m.origin, 2, LENGTH(m.origin)-1))::int
+    '''
+
+    print('Finding leftover manifestations')
+    cursor.execute(find_leftover_manifestations_query)
+
+    rows = cursor.fetchall()
+    print(f'Found {len(rows)} leftover Manifestations')
+
+    serialno = first_free_serial
+    for origin in rows:
+        expression_label = f'E{serialno}'
+        serialno += 1
+        expression_id = create_expression(cursor, expression_label)
+        link_manifestation_to_expression(cursor, origin, expression_id)
+
+
 conn = None
 try:
     print(f'Reading query from {path}:')
@@ -84,7 +110,10 @@ try:
     psycopg2.extras.register_uuid()
     conn = psycopg2.connect(**parser['db'])
     with conn.cursor() as curs:
-        find_similar_manifestations(curs, stmt)
+        print('Collecting similar manifestations into expressions')
+        serial = find_similar_manifestations(curs, stmt)
+        print('Assigning leftover manifestations to singleton expressions')
+        assign_leftover_manifestations(curs, serial)
         print('Committing results')
         conn.commit()
 except (Exception, psycopg2.DatabaseError) as error:
