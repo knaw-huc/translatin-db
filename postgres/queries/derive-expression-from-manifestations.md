@@ -4,7 +4,7 @@ Om van Manifestations naar Expressions te komen is het belangrijk om na te gaan
 welke Manifestations dezelfde intellectuele inhoud hebben. Zij vormen de
 Expressions. Volledige edities (first printing, reprints) die door één auteur
 (bijv. de Jezuïeten van Mechelen) zijn uitgebracht met min of meer dezelfde
-titel (Joseph/Ioseph), hetzelfde genre kennen maar door verschillende drukkers
+titel (Joseph/Ioseph), hetzelfde genre kennen, maar door verschillende drukkers
 zijn gedrukt, vallen bijvoorbeeld onder dezelfde Expression.
 
 Met de volgende metadata moet rekening worden gehouden in de query nu we van
@@ -13,7 +13,7 @@ Manifestations naar Expressions proberen te komen:
 - Alle auteurs moeten overeenkomen (hard criterium volgorde maakt niet uit),
 na implementatie van data Proot moeten we dit criterium waarschijnlijk herzien
 omdat we dan veel meer onbekende auteurs hebben opgespoord die werkten voor een
-organsation die we nu nog hebben onderscheiden als bijv. ‘Jezuïeten van…’). Kan
+organsation die we nu nog hebben onderscheiden (als bijv. ‘Jezuïeten van…’). Kan
 vooralsnog gewoon met ID’s van de auteurs.
 
 - Áls de taal of talen van een Manifestation met zekerheid zijn vastgesteld,
