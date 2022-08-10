@@ -11,7 +11,7 @@ proberen te komen:
   dit criterium waarschijnlijk herzien omdat we dan veel meer onbekende auteurs hebben opgespoord die werkten voor een
   Organisation die we nu nog hebben onderscheiden als bijv. ‘Jezuïeten van…’. Kan gewoon met ID’s van de auteurs.
 - De talen van de Expressions mogen variëren (ongeacht de zekerheid waarmee deze zijn vastgesteld). De volgorde speelt
-  hierbij geen rol geen rol.
+  hierbij geen rol.
 - Min of meer dezelfde titel, waarbij ook oog is voor titels in andere talen die aan elkaar gekoppeld kunnen worden op
   Work-niveau. Dit is het lastigste gedeelte van de query. Werken met een relatieve Levenstheinafstand van 0.1 of 0.2
   lijkt een goed uitgangspunt (ligt een beetje aan de zoekopbrengst). Letters die sowieso gelijk aan elkaar staan zijn:
