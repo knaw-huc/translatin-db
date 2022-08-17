@@ -5,7 +5,7 @@ import os
 import uuid
 
 import psycopg2.extras
-from icecream import icecream
+from icecream import ic
 from psycopg2.extras import execute_values
 
 parser = configparser.ConfigParser(interpolation=configparser.ExtendedInterpolation())
