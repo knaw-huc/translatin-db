@@ -10,7 +10,7 @@ from psycopg2.extras import execute_values
 
 parser = configparser.ConfigParser(interpolation=configparser.ExtendedInterpolation())
 parser.read('config.ini')
-conf = parser('base')
+conf = parser['base']
 path = ic(conf['work'])
 
 
@@ -36,34 +36,67 @@ def find_similar_expressions(cursor, find_similar_expressions_query):
     #   W3 = {…}
     #   …
     for row in rows:
-        # translate serial number to label: 1 -> "W1", 2 -> "W2", …
-        work_label = f'W{serialno}'
-
-        # and update serial number for next iteration
-        serialno += 1
-
-        # create a new Work: W1, W2, … and remember its UUID
-        work_id = create_work(cursor, work_label)
-
         # extract all Expression lables (E69, E72, …) that are in this row / Work
         expr_labels = [id for id in row if id is not None]
-        print(f'{work_label}: {expr_labels}')
+        print(f'{expr_labels}')
+
+        # find out if any of those expressions are linked to a work yet
+        for el in expr_labels:
+            work_label = find_work(cursor, el)
+            if work_label is not None:
+                print(f'{el} already connected to {work_id}')
+                break
+
+        if work_label is None:
+                # translate serial number to label: 1 -> "W1", 2 -> "W2", …
+                work_label = f'W{serialno}'
+
+                # and update serial number for next iteration
+                serialno += 1
+
+                # create a new Work: W1, W2, … and remember its UUID
+                work_id = create_work(cursor, work_label)
+        else:
+                print(f'Skipping {el}')
+                continue
+
 
         # link each expression label to the Work
         for el in expr_labels:
             link_expression_to_work(cursor, el, work_id)
 
-        return serialno
+    return serialno
 
 
-def create_work(cursor, label):
+def create_work(cursor, work_label):
     # label = e.g. "W12"
     # work_id = UUID
     work_id = uuid.uuid4()
     stmt = 'INSERT INTO works (id, label) VALUES (%s, %s)'
-    data = (work_id, label)
+    data = (work_id, work_label)
     cursor.execute(stmt, data)
     return work_id
+
+
+def find_work(cursor, expr_label):
+    stmt = '''
+    SELECT w.label
+    FROM expressions ex
+    JOIN work_expressions we on (we.expression_id = ex.id)
+    JOIN works w on (we.work_id = w.id)
+    WHERE ex.label = %s
+    '''
+    data = (expr_label,)
+    cursor.execute(stmt, data)
+
+    rows = cursor.fetchall()
+    print(f'found {len(rows)} Works')
+    if len(rows) == 0:
+        return None
+    print(f'rows[0]: {rows[0]}')
+    work_label = rows[0][0]
+    print(f'find_work({expr_label} -> {work_label}')
+    return work_label
 
 
 def link_expression_to_work(cursor, expr_label, work_id):
@@ -76,7 +109,7 @@ def link_expression_to_work(cursor, expr_label, work_id):
 
 
 def assign_leftover_expressions(cursor, first_free_serial):
-    find_leftover_expressions_query='''
+    find_leftover_expressions_query = '''
     SELECT e.label
     FROM expressions e
     WHERE NOT EXISTS (
@@ -85,7 +118,7 @@ def assign_leftover_expressions(cursor, first_free_serial):
     ORDER BY (SUBSTRING(e.label, 2, LENGTH(e.label)-1))::int
     '''
 
-    print('FInding leftover expressions')
+    print('Finding leftover expressions')
     cursor.execute(find_leftover_expressions_query)
 
     rows = cursor.fetchall()
@@ -110,11 +143,11 @@ try:
     print('Connecting to translatin database')
     psycopg2.extras.register_uuid()
     conn = psycopg2.connect(**parser['db'])
-    with conn.cursor() as curs:
+    with conn.cursor() as cursor:
         print('Collecting similar expressions into works')
-        serial = find_similar_expressions(cur, stmt)
+        serial = find_similar_expressions(cursor, stmt)
         print('Assigning leftover expressions to singleton works')
-        assign_leftover_expressions(curs, serial)
+        assign_leftover_expressions(cursor, serial)
         print('Committing results')
         conn.commit()
 except (Exception, psycopg2.DatabaseError) as error:
