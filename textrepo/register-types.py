@@ -15,6 +15,7 @@ def register_type(name, mediatype):
         TR.create_file_type(name, mediatype)
 
 
+# https://stackoverflow.com/questions/4212861/what-is-a-correct-mime-type-for-docx-pptx-etc
 register_type('doc', 'application/msword')
 register_type('docx', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document')
 register_type('mets', 'application/vnd.mets+xml')
